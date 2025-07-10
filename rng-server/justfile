@@ -3,11 +3,11 @@ RNG_IMAGE := "ghcr.io/fpco/kolme-rare-evo-demo/rng-server"
 
 # List all recipes
 default:
-	just --list --unsorted
+    just --list --unsorted
 
 # Compile
 cargo-compile-arm:
-	cross test --workspace --release --no-run --locked --target aarch64-unknown-linux-musl
+    cross test --workspace --release --no-run --locked --target aarch64-unknown-linux-musl
 
 # Build ARM binary
 build-arm-binary:
@@ -15,13 +15,13 @@ build-arm-binary:
 
 # Build image
 build-image:
-	cp ../target/aarch64-unknown-linux-musl/release/rng-server rng-server
-	docker image build . -f Dockerfile -t {{RNG_IMAGE}}:{{GIT_SHA}} --platform linux/arm64
+    cp ../target/aarch64-unknown-linux-musl/release/rng-server rng-server
+    docker image build . -f Dockerfile -t {{ RNG_IMAGE }}:{{ GIT_SHA }} --platform linux/arm64
 
 # Push image
 push-image:
-	docker push {{RNG_IMAGE}}:{{GIT_SHA}}
+    docker push {{ RNG_IMAGE }}:{{ GIT_SHA }}
 
 # Run application
 run:
-	cargo run -- serve
+    cargo run -- serve

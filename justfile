@@ -1,17 +1,17 @@
-# rng-server module
+# Rng server module
 mod rng './rng-server/justfile'
 
 # List all recipes
 default:
-	just --list --unsorted
+    just --list --unsorted
 
 # Compile project
 cargo-compile:
-	cargo test --workspace --no-run --locked
+    cargo test --workspace --no-run --locked
 
 # Clippy check
 cargo-clippy-check:
-	cargo clippy --no-deps --workspace --locked --tests --benches --examples -- -Dwarnings
+    cargo clippy --no-deps --workspace --locked --tests --benches --examples -- -Dwarnings
 
 # Fmt check
 cargo-fmt-check:
@@ -19,8 +19,8 @@ cargo-fmt-check:
 
 # Format all
 fmt:
-	cargo fmt --all
+    cargo fmt --all
 
 # Test
 cargo-test:
-	cargo nextest run --workspace --locked --no-tests pass
+    cargo nextest run --workspace --locked --no-tests pass

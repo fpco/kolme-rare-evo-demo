@@ -18,7 +18,7 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
@@ -27,8 +27,10 @@ async fn main() {
 
             let app = Router::new().route("/", get(root));
 
-            let listener = tokio::net::TcpListener::bind(bind).await.unwrap();
-            axum::serve(listener, app).await.unwrap();
+            let listener = tokio::net::TcpListener::bind(bind).await?;
+            axum::serve(listener, app).await?;
+
+            Ok(())
         }
     }
 }

@@ -32,6 +32,7 @@ jobs:
         with:
           toolchain: 1.84.0
           components: clippy, rustfmt
+          targets: aarch64-unknown-linux-musl
       - name: Dependencies
         run: sudo apt install musl-tools -y
       - name: Compile workspace (ARM64)

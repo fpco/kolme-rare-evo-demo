@@ -11,7 +11,7 @@ cargo-compile-arm:
 
 # Build ARM binary
 build-arm-binary:
-    cargo build --bin rng-server --locked --release --target aarch64-unknown-linux-musl
+    cross build --bin rng-server --locked --release --target aarch64-unknown-linux-musl
 
 # Build image
 build-image:

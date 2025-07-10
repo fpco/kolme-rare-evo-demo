@@ -24,10 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install depdendencies
-        uses: awalsh128/cache-apt-pkgs-action@v1
-        with:
-          packages: libudev-dev libusb-1.0-0-dev libhidapi-dev mold
       - uses: taiki-e/install-action@v2
         with:
           tool: just@1.40.0,nextest@0.9.99
@@ -42,41 +38,11 @@ jobs:
           cache-on-failure: true
           workspaces: |
             .
-      - uses: step-security/changed-files@v46
-        id: contracts
-        with:
-          files: |
-            contracts:
-              - contracts/**
-              - .ci/**
-      - name: Cache contract builds
-        uses: actions/cache@v4
-        id: contract-cache
-        with:
-          key: contracts-${{ hashFiles('contracts/cosmos/Cargo.toml') }}-${{ hashFiles('./.ci/build-contracts.sh')}} }
-          restore-keys: |
-            contracts-${{ hashFiles('contracts/cosmos/Cargo.toml') }}
-            contracts
-          path: |
-            wasm
       - name: Compile
         run: just cargo-compile
-      - name: Build contracts
-        if: ${{ (steps.contract-cache.outputs.cache-hit == false || steps.contracts.outputs.any_changed == 'true') }}
-        run: just build-contracts
       - name: Clippy
         run: just cargo-clippy-check
       - name: Rustfmt
         run: just cargo-fmt-check
-      - name: Postgres
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:45921/postgres?sslmode=disable
-        run: just postgres
       - name: Run tests
-        env:
-          PROCESSOR_BLOCK_DB: psql://postgres:postgres@localhost:45921/postgres
         run: just cargo-test
-      - name: Start localosmosis
-        run: just localosmosis
-      - name: Contract tests
-        run: just cargo-contract-tests

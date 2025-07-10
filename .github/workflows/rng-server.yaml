@@ -1,0 +1,53 @@
+name: rng-server
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # For cache, run at 5 AM UTC daily
+    - cron: "0 5 * * *"
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  CARGO_NET_RETRY: 10
+  RUST_BACKTRACE: short
+  RUSTUP_MAX_RETRIES: 10
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just@1.40.0,cross@0.2.5
+      - uses: Swatinem/rust-cache@v2
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.84.0
+          components: clippy, rustfmt
+          targets: aarch64-unknown-linux-musl
+      - name: Dependencies
+        run: sudo apt install musl-tools -y
+      - name: Compile workspace (ARM64)
+        run: just rng::cargo-compile-arm
+      - name: Build rng-server binary
+        run: just rng::build-arm-binary
+      - name: Build image
+        run: just rng::build-image
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event_name != 'schedule')
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push image
+        if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event_name != 'schedule')
+        run: just rng::push-image

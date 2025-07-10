@@ -1,0 +1,27 @@
+GIT_SHA := `git log -1 --format="%H"`
+RNG_IMAGE := "ghcr.io/fpco/kolme-rare-evo-demo/rng-server"
+
+# List all recipes
+default:
+    just --list --unsorted
+
+# Compile
+cargo-compile-arm:
+    cross test --workspace --release --no-run --locked --target aarch64-unknown-linux-musl
+
+# Build ARM binary
+build-arm-binary:
+    cross build --bin rng-server --locked --release --target aarch64-unknown-linux-musl
+
+# Build image
+build-image:
+    cp ../target/aarch64-unknown-linux-musl/release/rng-server rng-server
+    docker image build . -f Dockerfile -t {{ RNG_IMAGE }}:{{ GIT_SHA }} --platform linux/arm64
+
+# Push image
+push-image:
+    docker push {{ RNG_IMAGE }}:{{ GIT_SHA }}
+
+# Run application
+run:
+    cargo run -- serve

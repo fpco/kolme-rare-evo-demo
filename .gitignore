@@ -1,0 +1,6 @@
+rng-server
+.env
+.envrc
+flake.nix
+flake.lock
+target/

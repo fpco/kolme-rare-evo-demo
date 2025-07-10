@@ -12,8 +12,8 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     Serve {
-        #[clap(long, env = "PORT", default_value = "[::]:3000")]
-        port: SocketAddr,
+        #[clap(long, env = "BIND", default_value = "[::]:3000")]
+        bind: SocketAddr,
     },
 }
 
@@ -22,12 +22,12 @@ async fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Serve { port } => {
-            println!("Starting server on {}", port);
+        Commands::Serve { bind } => {
+            println!("Starting server on {}", bind);
 
             let app = Router::new().route("/", get(root));
 
-            let listener = tokio::net::TcpListener::bind(port).await.unwrap();
+            let listener = tokio::net::TcpListener::bind(bind).await.unwrap();
             axum::serve(listener, app).await.unwrap();
         }
     }

@@ -1,3 +1,4 @@
+use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, routing::get, Router};
 use clap::{Parser, Subcommand};
@@ -39,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
             )?;
 
             let app = Router::new()
-                .route("/", get(root))
+                .route("/number/{timestamp}", get(generate_signed_number))
                 .route("/public-key", get(public_key))
                 .with_state(signing_key);
 
@@ -57,8 +58,9 @@ struct Response {
     signature: String,
 }
 
-async fn root(
+async fn generate_signed_number(
     State(signing_key): State<SigningKey>,
+    Path(_timestamp): Path<u64>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
     let magic_number: u32 = rand::random();
     let signature: Signature = signing_key

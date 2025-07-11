@@ -60,7 +60,7 @@ struct Response {
 async fn root(
     State(signing_key): State<SigningKey>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
-    let magic_number: u32 = 42;
+    let magic_number: u32 = rand::random();
     let signature: Signature = signing_key
         .try_sign(&magic_number.to_be_bytes())
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;

@@ -48,23 +48,38 @@ async fn main() -> anyhow::Result<()> {
 }
 
 #[derive(Serialize)]
+struct Payload {
+    number: u32,
+    timestamp: u64,
+}
+
+#[derive(Serialize)]
 struct Response {
     number: u32,
     signature: String,
+    serialized: String,
+    timestamp: u64,
 }
 
 async fn generate_signed_number(
     State(signing_key): State<SigningKey>,
-    Path(_timestamp): Path<u64>,
+    Path(timestamp): Path<u64>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
-    let magic_number: u32 = rand::random();
+    let number: u32 = rand::random();
+    let payload = Payload { number, timestamp };
+
+    let serialized = serde_json::to_string(&payload)
+        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
+
     let signature: Signature = signing_key
-        .try_sign(&magic_number.to_be_bytes())
+        .try_sign(serialized.as_bytes())
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(Response {
-        number: magic_number,
+        number,
         signature: signature.to_string(),
+        serialized,
+        timestamp,
     }))
 }
 

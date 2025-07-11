@@ -758,6 +758,7 @@ dependencies = [
  "k256",
  "rand",
  "serde",
+ "serde_json",
  "tokio",
 ]
 

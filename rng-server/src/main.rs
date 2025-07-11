@@ -29,15 +29,10 @@ async fn main() -> anyhow::Result<()> {
 
     match cli.command {
         Commands::Serve { bind, signing_key } => {
-            println!("Starting server on {}", bind);
+            println!("Starting server on {bind}");
 
             let key_bytes = hex::decode(signing_key)?;
-            let signing_key = SigningKey::from_bytes(
-                key_bytes
-                    .as_slice()
-                    .try_into()
-                    .map_err(|_| anyhow::anyhow!("signing_key must be 32 bytes"))?,
-            )?;
+            let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
 
             let app = Router::new()
                 .route("/number/{timestamp}", get(generate_signed_number))

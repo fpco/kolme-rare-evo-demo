@@ -2,7 +2,9 @@ use axum::extract::Path;
 use axum::Json;
 use axum::{extract::State, routing::get, Router};
 use clap::{Parser, Subcommand};
+use hmac::{Hmac, Mac};
 use k256::ecdsa::{signature::Signer, Signature, SigningKey};
+use k256::sha2::Sha256;
 use serde::Serialize;
 use std::net::SocketAddr;
 
@@ -20,7 +22,15 @@ enum Commands {
         bind: SocketAddr,
         #[clap(long, env = "SIGNING_KEY")]
         signing_key: String,
+        #[clap(long, env = "HMAC_SECRET")]
+        hmac_secret: String,
     },
+}
+
+#[derive(Clone)]
+struct AppState {
+    signing_key: SigningKey,
+    hmac_key: Vec<u8>,
 }
 
 #[tokio::main]
@@ -28,16 +38,26 @@ async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Serve { bind, signing_key } => {
+        Commands::Serve {
+            bind,
+            signing_key,
+            hmac_secret,
+        } => {
             println!("Starting server on {bind}");
 
             let key_bytes = hex::decode(signing_key)?;
             let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
+            let hmac_key = hex::decode(hmac_secret)?;
+
+            let state = AppState {
+                signing_key,
+                hmac_key,
+            };
 
             let app = Router::new()
                 .route("/number/{timestamp}", get(generate_signed_number))
                 .route("/public-key", get(public_key))
-                .with_state(signing_key);
+                .with_state(state);
 
             let listener = tokio::net::TcpListener::bind(bind).await?;
             axum::serve(listener, app).await?;
@@ -61,17 +81,28 @@ struct Response {
     timestamp: u64,
 }
 
+type HmacSha256 = Hmac<Sha256>;
+
 async fn generate_signed_number(
-    State(signing_key): State<SigningKey>,
+    State(state): State<AppState>,
     Path(timestamp): Path<u64>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
-    let number: u32 = rand::random();
+    let mut mac = HmacSha256::new_from_slice(&state.hmac_key)
+        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
+    mac.update(&timestamp.to_be_bytes());
+    let result = mac.finalize().into_bytes();
+    // Take the first 4 bytes as a number
+    let number: u32 = result[0..4]
+        .try_into()
+        .map(u32::from_be_bytes)
+        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
     let payload = Payload { number, timestamp };
 
     let serialized = serde_json::to_string(&payload)
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let signature: Signature = signing_key
+    let signature: Signature = state
+        .signing_key
         .try_sign(serialized.as_bytes())
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -83,7 +114,7 @@ async fn generate_signed_number(
     }))
 }
 
-async fn public_key(State(signing_key): State<SigningKey>) -> String {
-    let public_key = signing_key.verifying_key();
+async fn public_key(State(state): State<AppState>) -> String {
+    let public_key = state.signing_key.verifying_key();
     hex::encode(public_key.to_sec1_bytes())
 }

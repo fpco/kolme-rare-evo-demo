@@ -31,7 +31,7 @@ enum Commands {
 #[derive(Clone)]
 struct AppState {
     signing_key: SigningKey,
-    hmac_key: Vec<u8>,
+    hmac_template: HmacSha256,
 }
 
 #[tokio::main]
@@ -50,9 +50,12 @@ async fn main() -> anyhow::Result<()> {
             let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
             let hmac_key = hex::decode(hmac_secret)?;
 
+            let hmac_template = HmacSha256::new_from_slice(&hmac_key)
+                .map_err(|_| anyhow::anyhow!("Failed to create HMAC instance from secret"))?;
+
             let state = AppState {
                 signing_key,
-                hmac_key,
+                hmac_template,
             };
 
             let app = Router::new()
@@ -98,8 +101,7 @@ async fn generate_signed_number(
         return Err(axum::http::StatusCode::NOT_FOUND);
     }
 
-    let mut mac = HmacSha256::new_from_slice(&state.hmac_key)
-        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
+    let mut mac = state.hmac_template.clone();
     mac.update(&timestamp.to_be_bytes());
     let result = mac.finalize().into_bytes();
     // Take the first 4 bytes as a number

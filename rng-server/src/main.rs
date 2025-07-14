@@ -31,7 +31,7 @@ enum Commands {
 #[derive(Clone)]
 struct AppState {
     signing_key: SigningKey,
-    hmac_template: HmacSha256,
+    hmac_template: Hmac<Sha256>,
 }
 
 #[tokio::main]
@@ -50,7 +50,7 @@ async fn main() -> anyhow::Result<()> {
             let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
             let hmac_key = hex::decode(hmac_secret)?;
 
-            let hmac_template = HmacSha256::new_from_slice(&hmac_key)
+            let hmac_template = Hmac::<Sha256>::new_from_slice(&hmac_key)
                 .map_err(|_| anyhow::anyhow!("Failed to create HMAC instance from secret"))?;
 
             let state = AppState {
@@ -84,8 +84,6 @@ struct Response {
     serialized: String,
     timestamp: u64,
 }
-
-type HmacSha256 = Hmac<Sha256>;
 
 async fn generate_signed_number(
     State(state): State<AppState>,

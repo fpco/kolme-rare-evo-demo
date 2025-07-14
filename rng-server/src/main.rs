@@ -7,6 +7,7 @@ use k256::ecdsa::{signature::Signer, Signature, SigningKey};
 use k256::sha2::Sha256;
 use serde::Serialize;
 use std::net::SocketAddr;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -87,6 +88,16 @@ async fn generate_signed_number(
     State(state): State<AppState>,
     Path(timestamp): Path<u64>,
 ) -> Result<Json<Response>, axum::http::StatusCode> {
+    // Prevent precognition: only allow past or current timestamps
+    let now_min = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?
+        .as_secs()
+        / 60;
+    if timestamp > now_min {
+        return Err(axum::http::StatusCode::NOT_FOUND);
+    }
+
     let mut mac = HmacSha256::new_from_slice(&state.hmac_key)
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
     mac.update(&timestamp.to_be_bytes());

@@ -1,4 +1,5 @@
 rng-server
+!rng-server/
 .env
 .envrc
 flake.nix

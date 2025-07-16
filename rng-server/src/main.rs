@@ -4,6 +4,7 @@ use axum::{extract::State, routing::get, Router};
 use clap::{Parser, Subcommand};
 use hmac::{Hmac, Mac};
 use k256::ecdsa::{signature::Signer, Signature, SigningKey};
+use rand_core::{OsRng, RngCore};
 use k256::sha2::Sha256;
 use serde::Serialize;
 use std::net::SocketAddr;
@@ -18,14 +19,17 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Serve web application
     Serve {
-        #[clap(long, env = "BIND", default_value = "[::]:3000")]
+        #[clap(long, env = "RARE_EVO_BIND", default_value = "[::]:3000")]
         bind: SocketAddr,
-        #[clap(long, env = "SIGNING_KEY")]
+        #[clap(long, env = "RARE_EVO_SIGNING_KEY")]
         signing_key: String,
-        #[clap(long, env = "HMAC_SECRET")]
+        #[clap(long, env = "RARE_EVO_HMAC_SECRET")]
         hmac_secret: String,
     },
+    /// Generate random keys
+    Generate {},
 }
 
 #[derive(Clone)]
@@ -45,29 +49,36 @@ async fn main() -> anyhow::Result<()> {
             hmac_secret,
         } => {
             println!("Starting server on {bind}");
-
             let key_bytes = hex::decode(signing_key)?;
             let signing_key = SigningKey::from_bytes(key_bytes.as_slice().into())?;
             let hmac_key = hex::decode(hmac_secret)?;
-
             let hmac_template = Hmac::<Sha256>::new_from_slice(&hmac_key)
                 .map_err(|_| anyhow::anyhow!("Failed to create HMAC instance from secret"))?;
-
             let state = AppState {
                 signing_key,
                 hmac_template,
             };
-
             let app = Router::new()
                 .route("/number/{timestamp}", get(generate_signed_number))
                 .route("/public-key", get(public_key))
+                .route("/healthz", get(health))
                 .with_state(state);
-
             let listener = tokio::net::TcpListener::bind(bind).await?;
             axum::serve(listener, app).await?;
-
             Ok(())
         }
+        Commands::Generate {} => {
+            let mut rng = OsRng;
+            let key = SigningKey::random(&mut rng);
+            let key = hex::encode_upper(key.to_bytes());
+            const KEY_SIZE: usize = 20;
+            let mut hmac_key = [0u8; KEY_SIZE];
+            rng.fill_bytes(&mut hmac_key);
+            let hmac_key = hex::encode_upper(hmac_key);
+            eprintln!("Signing key: {key}");
+            eprintln!("HMAC key: {hmac_key}");
+            Ok(())
+        },
     }
 }
 
@@ -128,4 +139,8 @@ async fn generate_signed_number(
 async fn public_key(State(state): State<AppState>) -> String {
     let public_key = state.signing_key.verifying_key();
     hex::encode(public_key.to_sec1_bytes())
+}
+
+async fn health() -> &'static str {
+    "Healthy!"
 }

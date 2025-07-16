@@ -4,8 +4,8 @@ use axum::{extract::State, routing::get, Router};
 use clap::{Parser, Subcommand};
 use hmac::{Hmac, Mac};
 use k256::ecdsa::{signature::Signer, Signature, SigningKey};
-use rand_core::{OsRng, RngCore};
 use k256::sha2::Sha256;
+use rand_core::{OsRng, RngCore};
 use serde::Serialize;
 use std::net::SocketAddr;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -78,7 +78,7 @@ async fn main() -> anyhow::Result<()> {
             eprintln!("Signing key: {key}");
             eprintln!("HMAC key: {hmac_key}");
             Ok(())
-        },
+        }
     }
 }
 

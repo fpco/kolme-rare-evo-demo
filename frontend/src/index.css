@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@keyframes pulse-scale {
+  0%,
+  80%,
+  85%,
+  100% {
+    transform: scale(1);
+  }
+  82.5% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 10s infinite;
+}

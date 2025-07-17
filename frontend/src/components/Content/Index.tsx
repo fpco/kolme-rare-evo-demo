@@ -1,4 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+
 import Card from '../Card/Index'
+import Leaderboard from '../Leaderboard/Index'
 
 const mockLeaderboardData = [
   {
@@ -74,51 +78,99 @@ const mockLeaderboardData = [
 ]
 
 const Content = () => {
+  const [countdown, setCountdown] = useState(10)
+  const [isActive, setIsActive] = useState(true)
+  const [randomNumber, setRandomNumber] = useState(123)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [animationNumber, setAnimationNumber] = useState(123)
+
+  const { refetch: generateNewNumber } = useQuery({
+    queryKey: ['randomNumber'],
+    queryFn: async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      return Math.floor(Math.random() * 900) + 100
+    },
+    enabled: false,
+  })
+
+  useEffect(() => {
+    let animationInterval: number | null = null
+
+    if (isGenerating) {
+      animationInterval = setInterval(() => {
+        setAnimationNumber(Math.floor(Math.random() * 900) + 100)
+      }, 50)
+    }
+
+    return () => {
+      if (animationInterval) clearInterval(animationInterval)
+    }
+  }, [isGenerating])
+
+  useEffect(() => {
+    let interval: number | null = null
+
+    if (isActive && countdown > 0) {
+      interval = setInterval(() => {
+        setCountdown((prev) => prev - 1)
+      }, 1000)
+    } else if (countdown === 0) {
+      setIsActive(false)
+      setIsGenerating(true)
+
+      generateNewNumber().then((result) => {
+        if (result.data) {
+          setTimeout(() => {
+            setRandomNumber(result.data)
+            setAnimationNumber(result.data)
+            setIsGenerating(false)
+          }, 2000)
+        }
+      })
+
+      setTimeout(() => {
+        setCountdown(10)
+        setIsActive(true)
+      }, 5000)
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [isActive, countdown, generateNewNumber])
+
   return (
     <div className="flex max-w-full gap-4 min-h-2/3">
-      <Card id="leaderboard" className="w-1/3 bg-black/30 p-4 rounded-xl">
-        <h3 className="text-2xl font-bold text-white mb-4">Leaderboard</h3>
-        {mockLeaderboardData.map((entry, index) => (
-          <div
-            key={entry.rank}
-            className="flex items-center justify-between p-3 rounded-xl hover:bg-black/30 transition-all animate-pulse-scale"
-            style={{
-              animationDelay: `${8 + index * 150}ms`,
-              animationDuration: '10s',
-              animationIterationCount: 'infinite',
-            }}
-          >
-            <div className="flex items-center">
-              <div className="text-lg font-bold text-gray-300 w-6">
-                {entry.rank}
-              </div>
-              <img
-                src={entry.avatar}
-                alt={entry.username}
-                className="w-10 h-10 rounded-full mr-2"
-              />
-              <div className="flex flex-col">
-                <span className="text-white font-medium">{entry.username}</span>
-                <span className="text-xs text-gray-400 truncate max-w-32">
-                  {entry.walletId}
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-orange-400 font-bold">
-                {entry.points.toLocaleString()}
-              </div>
-              <div className="text-xs text-gray-400">points</div>
-            </div>
-          </div>
-        ))}
-      </Card>
+      <Leaderboard data={mockLeaderboardData} />
       <Card
         id="mainContent"
-        className="w-2/3 flex flex-col gap-4 bg-black/30 p-4 rounded-xl"
+        className="w-2/3 flex flex-col gap-4  p-4 rounded-xl"
       >
-        <h1 className="text-6xl font-bold">Number_Generated</h1>
-        <div>text input</div>
+        <div className="w-full h-full items-center justify-center flex flex-col gap-4">
+          <div className="text-4xl font-bold text-[#FF9409] mb-4">
+            {countdown === 0
+              ? isGenerating
+                ? 'Generating...'
+                : "Time's up!"
+              : `${countdown}s`}
+          </div>
+          <h1 className="text-[220px] font-bold font-montserrat">
+            {isGenerating ? animationNumber : randomNumber}
+          </h1>
+          <h2
+            style={{
+              transition: 'color 0.3s ease',
+              color: !isGenerating ? 'transparent' : 'inherit',
+            }}
+          >
+            Last number was: {randomNumber}
+          </h2>
+          <input
+            type="number"
+            placeholder="Input your number"
+            className="ring-1 ring-[#FF9409] rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-2 text-center"
+          />
+        </div>
       </Card>
     </div>
   )

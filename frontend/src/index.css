@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --font-montserrat: "Montserrat", sans-serif;
+}
+
+body {
+  font-family: var(--font-montserrat);
+}
+
 @keyframes pulse-scale {
   0%,
   80%,
@@ -14,4 +22,9 @@
 
 .animate-pulse-scale {
   animation: pulse-scale 10s infinite;
+}
+
+/* Custom font classes */
+.font-montserrat {
+  font-family: var(--font-montserrat);
 }

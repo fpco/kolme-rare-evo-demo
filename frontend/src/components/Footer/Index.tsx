@@ -4,7 +4,7 @@ import Card from '../Card/Index'
 
 const Footer = () => {
   return (
-    <Card className="bg-black/30 rounded-xl flex items-center justify-between p-4">
+    <Card className="md:bg-black/30 rounded-xl flex items-center justify-between p-4">
       <a href="https://www.fpblock.com/" target="_blank" rel="noopener">
         <img
           src="https://framerusercontent.com/images/wBvSDht7DqRJpSfO2xTNgwgjvvo.png"

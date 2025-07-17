@@ -140,11 +140,11 @@ const Content = () => {
   }, [isActive, countdown, generateNewNumber])
 
   return (
-    <div className="flex max-w-full gap-4 min-h-2/3">
+    <div className="flex flex-col-reverse justify-center items-center md:flex-row max-w-full gap-4 min-h-2/3">
       <Leaderboard data={mockLeaderboardData} />
       <Card
         id="mainContent"
-        className="w-2/3 flex flex-col gap-4  p-4 rounded-xl"
+        className="w-2/3 flex flex-col gap-4 p-4 rounded-xl"
       >
         <div className="w-full h-full items-center justify-center flex flex-col gap-4">
           <div className="text-4xl font-bold text-[#FF9409] mb-4">

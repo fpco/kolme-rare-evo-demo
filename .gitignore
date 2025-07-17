@@ -5,3 +5,5 @@ rng-server
 flake.nix
 flake.lock
 target/
+tf.out
+.terraform

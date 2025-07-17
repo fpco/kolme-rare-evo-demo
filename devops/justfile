@@ -1,0 +1,40 @@
+# List all recipies
+default:
+    just --list
+
+# Runs terraform get and terraform init for env
+init:
+    terraform get
+    terraform init
+
+# use 'terraform plan' to map out updates to apply
+plan:
+    amber exec -- terraform plan -out=tf.out
+
+# use 'terraform apply' to apply updates in a 'tf.out' plan file
+apply:
+    terraform apply tf.out
+
+# use 'terraform destroy' to remove all resources from AWS
+destroy:
+    terraform destroy
+
+# Show output
+output:
+    terraform output -json
+
+# Switch to appropriate terraform
+tfswitch:
+    tfswitch
+
+# Terraform refresh
+refresh:
+    terraform refresh
+
+# Format
+fmt:
+    terraform fmt
+
+# Open application
+open:
+    xdg-open https://rng.prod.fpcomplete.com/public-key

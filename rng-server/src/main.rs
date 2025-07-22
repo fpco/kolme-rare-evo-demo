@@ -3,7 +3,7 @@ use axum::Json;
 use axum::{extract::State, routing::get, Router};
 use clap::{Parser, Subcommand};
 use hmac::{Hmac, Mac};
-use k256::ecdsa::{signature::Signer, Signature, SigningKey};
+use k256::ecdsa::SigningKey;
 use k256::sha2::Sha256;
 use rand_core::{OsRng, RngCore};
 use serde::Serialize;
@@ -92,6 +92,7 @@ struct Payload {
 struct Response {
     number: u32,
     signature: String,
+    recovery_id: u8,
     serialized: String,
     timestamp: u64,
 }
@@ -123,22 +124,23 @@ async fn generate_signed_number(
     let serialized = serde_json::to_string(&payload)
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let signature: Signature = state
+    let (signature, recovery_id) = state
         .signing_key
-        .try_sign(serialized.as_bytes())
+        .sign_recoverable(serialized.as_bytes())
         .map_err(|_| axum::http::StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(Response {
         number,
         signature: signature.to_string(),
+        recovery_id: recovery_id.to_byte(),
         serialized,
         timestamp,
     }))
 }
 
-async fn public_key(State(state): State<AppState>) -> String {
+async fn public_key(State(state): State<AppState>) -> Json<String> {
     let public_key = state.signing_key.verifying_key();
-    hex::encode(public_key.to_sec1_bytes())
+    Json(hex::encode(public_key.to_sec1_bytes()))
 }
 
 async fn health() -> &'static str {

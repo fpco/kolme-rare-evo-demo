@@ -485,7 +485,7 @@ async fn leaderboard(kolme: Kolme<GuessGame>) -> Result<()> {
 
                 let mut winners = totals.iter().collect::<Vec<_>>();
                 winners.sort_by(|x, y| y.1.cmp(x.1));
-                for (idx, (winner, winnings)) in winners.iter().take(1).enumerate() {
+                for (idx, (winner, winnings)) in winners.iter().take(10).enumerate() {
                     println!("{}: account {winner}: {winnings}", idx + 1);
                 }
 

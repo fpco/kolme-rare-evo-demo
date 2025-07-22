@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-:root {
+@theme {
+  --color-fpblock: #FF9409;
   --font-montserrat: "Montserrat", sans-serif;
+
 }
 
 body {

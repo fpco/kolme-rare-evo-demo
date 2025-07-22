@@ -94,7 +94,7 @@ const Content = () => {
   })
 
   useEffect(() => {
-    let animationInterval: number | null = null
+    let animationInterval: ReturnType<typeof setInterval> | null = null
 
     if (isGenerating) {
       animationInterval = setInterval(() => {
@@ -108,7 +108,7 @@ const Content = () => {
   }, [isGenerating])
 
   useEffect(() => {
-    let interval: number | null = null
+    let interval: ReturnType<typeof setInterval> | null = null
 
     if (isActive && countdown > 0) {
       interval = setInterval(() => {
@@ -147,7 +147,7 @@ const Content = () => {
         className="w-2/3 flex flex-col gap-4 p-4 rounded-xl"
       >
         <div className="w-full h-full items-center justify-center flex flex-col gap-4">
-          <div className="text-4xl font-bold text-[#FF9409] mb-4">
+          <div className="text-4xl font-bold text-fpblock mb-4">
             {countdown === 0
               ? isGenerating
                 ? 'Generating...'
@@ -168,7 +168,7 @@ const Content = () => {
           <input
             type="number"
             placeholder="Input your number"
-            className="ring-1 ring-[#FF9409] rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-2 text-center"
+            className="ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-2 text-center"
           />
         </div>
       </Card>

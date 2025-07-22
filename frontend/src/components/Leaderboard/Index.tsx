@@ -68,7 +68,7 @@ const Leaderboard = ({ data }: LeaderboardProps) => {
                 </button>
               </div>
               <div className="text-right flex items-baseline gap-1">
-                <div className="text-[#FF9409] font-bold">
+                <div className="text-fpblock font-bold">
                   {entry.points.toLocaleString()}
                 </div>
                 <div className="text-xs text-gray-400">points</div>

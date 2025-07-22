@@ -7,7 +7,7 @@ edition = "2024"
 anyhow = "1.0.98"
 clap = { version = "4.5.41", features = ["env", "derive"] }
 kolme = { git = "https://github.com/fpco/kolme", rev = "f4e39f7fce0ceef215d21d6021f13f4b809310b6" }
-reqwest = { version = "0.12.22", features = ["rustls-tls", "json", "gzip", "brotli", "blocking"] }
+reqwest = { version = "0.12.22", features = ["rustls-tls-webpki-roots", "json", "gzip", "brotli", "blocking"], default-features = false }
 rust_decimal = { version = "1.37.2", features = ["macros"] }
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.141"

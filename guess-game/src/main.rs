@@ -72,7 +72,10 @@ async fn serve(opt: ServeOpt) -> Result<()> {
         .error_for_status()?
         .json()
         .await?;
-    anyhow::ensure!(rng_public_key == actual_public_key);
+    anyhow::ensure!(
+        rng_public_key == actual_public_key,
+        "Public key mismatch: expected {rng_public_key}, but got {actual_public_key}"
+    );
     println!("Confirmed RNG server is using expected public key {rng_public_key}");
 
     let game = GuessGame::new(validator_secret_key.public_key(), rng_public_key);

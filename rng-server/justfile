@@ -24,4 +24,8 @@ push-image:
 
 # Run application
 run:
-    cargo run -- serve
+    cargo run -- serve --signing-key FE71B26BDD83FAF15CBD6EF92C0136F62AF9DDB1FB6AB9B8681EC46A58E7B783 --hmac-secret D3434F61A91B3DA91AD71EA43B67D7BF25E8B329
+
+# Generate keys
+generate:
+	cargo run -- generate

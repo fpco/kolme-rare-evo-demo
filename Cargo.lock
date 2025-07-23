@@ -701,6 +701,7 @@ dependencies = [
  "hex",
  "hmac",
  "k256",
+ "rand_core",
  "serde",
  "serde_json",
  "tokio",

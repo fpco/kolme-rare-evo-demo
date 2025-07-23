@@ -1,0 +1,35 @@
+# List all recipes
+default:
+    just --list --unsorted
+
+# Run application
+serve:
+    cargo run serve \
+        --validator-secret-key 20bf4ba70b9ea4525af3f19bcd16ae8c3b0dc70748669b3cce466d17e30e5c37
+
+# Test grab funds
+grab-funds:
+    kolme send-tx \
+        --secret-key 03f2f984fdf0e1712193da117addc1ceb3f7d78484eefcaf87cfc7dcd5b86527 \
+        '{"app":{"grab-funds":{}}}'
+
+# Place a bet on 42
+place-bet:
+    kolme send-tx \
+        --secret-key 03f2f984fdf0e1712193da117addc1ceb3f7d78484eefcaf87cfc7dcd5b86527 \
+        '{"app":{"place-bet":{"guess":42,"amount":"40"}}}'
+
+# Place a few bets for testing
+test-bets:
+    kolme send-tx \
+        --secret-key 081ae5204ede22838a16ae0b5c0ae0ff5eb0b42e759c78c8a187a4fe447a49b3 \
+        '{"app":{"grab-funds":{}}}' \
+        '{"app":{"place-bet":{"guess":60,"amount":"75"}}}'
+    kolme send-tx \
+        --secret-key d1f51f3af934401d12ea6dc421e1133a55d04ab643fd45334711c57d9ab34960 \
+        '{"app":{"grab-funds":{}}}' \
+        '{"app":{"place-bet":{"guess":180,"amount":"25"}}}'
+    kolme send-tx \
+        --secret-key 95f426d234cfac21fdc2a13df751af309c71d49f9f6c18bec8ddbedaa0603ecf \
+        '{"app":{"grab-funds":{}}}' \
+        '{"app":{"place-bet":{"guess":100,"amount":"100"}}}'

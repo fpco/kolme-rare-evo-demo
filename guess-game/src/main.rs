@@ -318,7 +318,7 @@ impl KolmeApp for GuessGame {
 
                 let mut total_bet = Decimal::ZERO;
                 let mut winning_weights = HashMap::<_, Decimal>::new();
-                let mut winning_distance = 255u8;
+                let mut winning_distance = u8::MAX;
                 let mut total_weight = Decimal::ZERO;
 
                 for Wager {

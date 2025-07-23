@@ -1,6 +1,6 @@
 # FP Block Kolme Demo - RareEvo 2025
 
-This repo contains a sample application using [Kolme](https://kolme.fpblock.com). It is the complete codebase for a live coding demo by [FP Block](https://www.fpblock.com) for [RareEvo 2025](https://rareevo.io/). The demo is a simple application designed to demonstrate the some of the abilities of Kolme, namely:
+This repo contains a sample application using [Kolme](https://kolme.fpblock.com). It is the complete codebase for a live coding demo by [FP Block](https://www.fpblock.com) for [RareEvo 2025](https://rareevo.io/). The demo is a simple application designed to demonstrate some of the abilities of Kolme, namely:
 
 * Ingestion of off-chain data
 * Unbounded CPU time computations

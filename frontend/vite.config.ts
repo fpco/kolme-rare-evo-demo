@@ -1,11 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
   server: {
-    port: 3000,
+    port: 1337,
   },
-  plugins: [tailwindcss(), react()],
+  plugins: [tailwindcss(), react(), nodePolyfills(
+    {
+      include: ['buffer', 'crypto'],
+    }
+  )],
 })

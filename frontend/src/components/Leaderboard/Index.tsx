@@ -28,10 +28,10 @@ const Leaderboard = ({ data }: LeaderboardProps) => {
   }
 
   return (
-    <Card id="leaderboard" className="w-full md:w-1/3 bg-black/30 rounded-xl flex flex-col">
+    <Card id="leaderboard" className="w-full md:w-1/3 bg-black/30 rounded-xl flex flex-col h-full">
       <h3 className="text-2xl font-bold text-white mb-4">Leaderboard</h3>
       
-      <div className="flex-1 min-h-[500px] flex flex-col">
+      <div className="flex-1 min-h-[600px] flex flex-col">
         {data.length === 0 ? (
           <div className="text-center py-8 flex-1 flex flex-col justify-center">
             <div className="text-6xl mb-4">🏆</div>
@@ -41,17 +41,17 @@ const Leaderboard = ({ data }: LeaderboardProps) => {
             </p>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto space-y-2">
+          <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
             {data.map((entry, index) => (
-          <div
-            key={entry.rank}
-            className="flex w-full flex-col xl:flex-row items-center justify-between p-3 rounded-xl hover:bg-black/30 transition-all animate-pulse-scale"
-            style={{
-              animationDelay: `${20 + index * 150}ms`,
-              animationDuration: '10s',
-              animationIterationCount: 'infinite',
-            }}
-          >
+              <div
+                key={entry.rank}
+                className="flex w-full flex-col xl:flex-row items-center justify-between p-3 rounded-xl hover:bg-black/30 transition-all"
+                style={{
+                  animationDelay: `${20 + index * 150}ms`,
+                  animationDuration: '10s',
+                  animationIterationCount: 'infinite',
+                }}
+              >
             <div className="flex items-center w-full">
               <div className="text-lg font-bold text-gray-300 w-6">
                 {entry.rank}

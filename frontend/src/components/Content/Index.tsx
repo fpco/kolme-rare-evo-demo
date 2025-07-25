@@ -28,7 +28,7 @@ const Content = () => {
     if (gameData?.current_round_finishes) {
       const finishTime = new Date(gameData.current_round_finishes).getTime()
       const now = Date.now()
-      const timeUntilRefetch = finishTime - now + 1000 // one second after finish
+      const timeUntilRefetch = finishTime - now + 5000 // one second after finish
 
       if (timeUntilRefetch > 0) {
         const timeout = setTimeout(() => {
@@ -57,7 +57,7 @@ const Content = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimatedNumber(Math.floor(Math.random() * 256))
-    }, 100) 
+    }, 25) 
 
     return () => {
       clearInterval(interval)
@@ -114,8 +114,6 @@ const Content = () => {
     )
   }
 
-  const currentBets = gameData?.current_bets ? parseFloat(gameData.current_bets) : 0
-
   return (
     <div className="flex flex-col-reverse justify-center items-center md:flex-row max-w-full gap-4 min-h-2/3">
       <Leaderboard data={formattedLeaderboard} />
@@ -142,11 +140,6 @@ const Content = () => {
                   {gameData.last_winner.number}
                 </h1>
                 <p className="text-lg text-gray-300 mb-2">Last Winning Number</p>
-                {currentBets > 0 && (
-                  <p className="text-2xl font-bold text-green-400 mb-4">
-                    Current Bets: {currentBets.toFixed(2)}
-                  </p>
-                )}
               </>
             ) : (
               <>
@@ -154,50 +147,15 @@ const Content = () => {
                   {animatedNumber.toString().padStart(3, '0')}
                 </h1>
                 <p className="text-lg text-gray-300 mb-2">Generating Numbers...</p>
-                {currentBets > 0 && (
-                  <p className="text-2xl font-bold text-green-400 mb-4">
-                    Current Bets: {currentBets.toFixed(2)}
-                  </p>
-                )}
               </>
             )}
           </div>
-
-          {gameData?.last_winner ? (
-            <div className="text-center bg-black/20 p-4 rounded-lg mb-4">
-              <h3 className="text-lg font-bold text-green-400 mb-2">🏆 Last Round Results!</h3>
-              <p className="text-white">Winning Number: <span className="text-fpblock font-bold text-xl">{gameData.last_winner.number}</span></p>
-              
-              {Object.keys(gameData.last_winner.winnings).length > 0 ? (
-                <>
-                  <p className="text-sm text-gray-300 mt-2">
-                    {Object.keys(gameData.last_winner.winnings).length} winner(s)
-                  </p>
-                  <p className="text-sm text-gray-300">
-                    Total Winnings: <span className="text-green-400 font-bold">
-                      {Object.values(gameData.last_winner.winnings).reduce((sum, amount) => sum + parseFloat(amount), 0).toFixed(0)}
-                    </span>
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-gray-400 mt-2">No winners this round</p>
-              )}
-              
-              <p className="text-xs text-gray-400 mt-2">
-                📅 {new Date(gameData.last_winner.finished).toLocaleString()}
-              </p>
-            </div>
-          ) : (
-            <div className="text-center bg-black/20 p-4 rounded-lg mb-4">
-              <p className="text-gray-400">🎮 First round coming up - no previous winners yet!</p>
-            </div>
-          )}
 
           <div className="w-full max-w-xs">
             <input
               type="number"
               min="0"
-              placeholder="Enter your guess"
+              placeholder={countdown === 0 ? "Betting closed" : "Enter your guess"}
               value={userGuess}
               onChange={(e) => {
                 const value = e.target.value
@@ -208,18 +166,9 @@ const Content = () => {
               className="w-full ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-3 text-center text-white placeholder-gray-400"
               disabled={countdown === 0}
             />
-            {countdown === 0 ? (
-              <p className="text-center text-sm text-red-400 mt-2">
-                ⏰ Betting closed for this round
-              </p>
-            ) : (
-              <p className="text-center text-sm text-gray-400 mt-2">
-                💡 Guess a number
-              </p>
-            )}
           </div>
-          <div className="text-center text-sm text-gray-300 space-y-1">
-            <p>🕐 Round finishes: {gameData?.current_round_finishes ? new Date(gameData.current_round_finishes).toLocaleTimeString() : 'Loading...'}</p>
+          <div className="text-center text-xs text-gray-300 space-y-1">
+            <p>Round finishes: {gameData?.current_round_finishes ? new Date(gameData.current_round_finishes).toLocaleTimeString() : 'Loading...'}</p>
           </div>
         </div>
       </Card>

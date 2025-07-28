@@ -14,7 +14,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/react-query": "^5.83.0",
     "graz": "^0.3.3",
-    "kolme-client": "link:..\\..\\kolme-client",
+    "kolme-client": "git://github.com/fpco/kolme-client.git#bcdddfa3ea0e8e785cef1444cad925aa6c23561d",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.11",

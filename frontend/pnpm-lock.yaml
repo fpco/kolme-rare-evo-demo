@@ -21,8 +21,8 @@ importers:
         specifier: ^0.3.3
         version: 0.3.3(@cosmjs/amino@0.34.0)(@cosmjs/cosmwasm-stargate@0.34.0)(@cosmjs/encoding@0.34.0)(@cosmjs/proto-signing@0.34.0)(@cosmjs/stargate@0.34.0)(@tanstack/react-query@5.83.0(react@19.1.0))(@types/react@19.1.8)(react@19.1.0)(starknet@6.24.1)(typescript@5.8.3)(use-sync-external-store@1.2.0(react@19.1.0))
       kolme-client:
-        specifier: link:..\..\kolme-client
-        version: link:../../kolme-client
+        specifier: git://github.com/fpco/kolme-client.git#bcdddfa3ea0e8e785cef1444cad925aa6c23561d
+        version: https://codeload.github.com/fpco/kolme-client/tar.gz/bcdddfa3ea0e8e785cef1444cad925aa6c23561d(fp-ts@2.16.10)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -683,6 +683,9 @@ packages:
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
+
+  '@noble/secp256k1@2.3.0':
+    resolution: {integrity: sha512-0TQed2gcBbIrh7Ccyw+y/uZQvbJwm7Ao4scBUxqpBCcsOlZG0O4KGfjtNAy/li4W8n1xt3dxrwJ0beZ2h2G6Kw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1728,6 +1731,9 @@ packages:
     resolution: {integrity: sha512-jqdObeR2rxZZbPSGL+3VckHMYtu+f9//KXBsVny6JSX/pa38Fy+bGjuG8eW/H6USNQWhLi8Num++cU2yOCNz4A==}
     engines: {node: '>= 0.12'}
 
+  fp-ts@2.16.10:
+    resolution: {integrity: sha512-vuROzbNVfCmUkZSUbnWSltR1sbheyQbTzug7LB/46fEa1c0EucLeBaCEUE0gF3ZGUGBt9lVUiziGOhhj6K1ORA==}
+
   fs-extra@10.1.0:
     resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
     engines: {node: '>=12'}
@@ -1868,6 +1874,11 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
+  io-ts@2.2.22:
+    resolution: {integrity: sha512-FHCCztTkHoV9mdBsHpocLpdTAfh956ZQcIkWQxxS0U5HT53vtrcuYdQneEJKH6xILaLNzXVl2Cvwtoy8XNN0AA==}
+    peerDependencies:
+      fp-ts: ^2.5.0
+
   iron-webcrypto@1.2.1:
     resolution: {integrity: sha512-feOM6FaSr6rEABp/eDfVseKyTMDt+KGpeB35SkVn9Tyn0CqvVsY3EwI0v5i8nMHyJnzCIQf7nsy3p41TPkJZhg==}
 
@@ -1997,6 +2008,10 @@ packages:
 
   keyvaluestorage-interface@1.0.0:
     resolution: {integrity: sha512-8t6Q3TclQ4uZynJY9IGr2+SsIGwK9JHcO6ootkHCGA0CrQCRy+VkouYNO2xicET6b9al7QKzpebNow+gkpCL8g==}
+
+  kolme-client@https://codeload.github.com/fpco/kolme-client/tar.gz/bcdddfa3ea0e8e785cef1444cad925aa6c23561d:
+    resolution: {tarball: https://codeload.github.com/fpco/kolme-client/tar.gz/bcdddfa3ea0e8e785cef1444cad925aa6c23561d}
+    version: 1.0.0
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -3751,6 +3766,8 @@ snapshots:
 
   '@noble/hashes@1.8.0': {}
 
+  '@noble/secp256k1@2.3.0': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -5089,6 +5106,8 @@ snapshots:
       mime-types: 2.1.35
       safe-buffer: 5.2.1
 
+  fp-ts@2.16.10: {}
+
   fs-extra@10.1.0:
     dependencies:
       graceful-fs: 4.2.11
@@ -5272,6 +5291,10 @@ snapshots:
 
   inherits@2.0.4: {}
 
+  io-ts@2.2.22(fp-ts@2.16.10):
+    dependencies:
+      fp-ts: 2.16.10
+
   iron-webcrypto@1.2.1: {}
 
   is-arguments@1.2.0:
@@ -5389,6 +5412,14 @@ snapshots:
       json-buffer: 3.0.1
 
   keyvaluestorage-interface@1.0.0: {}
+
+  kolme-client@https://codeload.github.com/fpco/kolme-client/tar.gz/bcdddfa3ea0e8e785cef1444cad925aa6c23561d(fp-ts@2.16.10):
+    dependencies:
+      '@noble/secp256k1': 2.3.0
+      buffer: 6.0.3
+      io-ts: 2.2.22(fp-ts@2.16.10)
+    transitivePeerDependencies:
+      - fp-ts
 
   levn@0.4.1:
     dependencies:

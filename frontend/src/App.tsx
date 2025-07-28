@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import Content from './components/Content/Index'
 import Footer from './components/Footer/Index'
 import Header from './components/Header/Index'
-import { client, privateKey } from './kolmeclient';
+import { client } from './kolmeclient';
 
 function App() {
 
@@ -12,7 +12,7 @@ function App() {
       (message) => {  
         console.log('Received message:', message);
     },
-      (socketState) => {  
+      (_socketState) => {  
       }
     )
   }, []);

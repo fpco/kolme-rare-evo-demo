@@ -40,7 +40,7 @@ export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): Formatte
   return leaderboard.map((entry, index) => ({
     rank: index + 1,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.account}`,
-    username: `Player_${entry.account.slice(0, 8)}`,
+    username: `Player_${entry.account}`,
     walletId: entry.account,
     points: Math.round(parseFloat(entry.winnings) * 100), // Convert to points (multiply by 100 for display)
   }));

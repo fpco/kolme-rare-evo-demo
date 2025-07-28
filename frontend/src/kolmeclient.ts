@@ -37,8 +37,8 @@ export const privateKey = await getPrivateKey(encryptionKey);
 export const claimFunds = async () => {
   
   const block = await client.broadcast(privateKey, [{
-      GuessMessage: {
-        GrabFunds: {}
+      App:{
+        "grab-funds": {}
       }
   }]);
   

@@ -6,6 +6,10 @@ module "route53_records" {
     rng = {
       domain_prefix = "rng",
       record        = module.alb.dns_name
+    },
+    nlb = {
+      domain_prefix = "nlb",
+      record = module.nlb.dns_name
     }
   }
 

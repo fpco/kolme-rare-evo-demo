@@ -4,11 +4,15 @@ import { useEffect, useState } from 'react'
 import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
 import { fetchGameData, formatLeaderboardData, calculateCountdown, type GameData } from '../../api/gameApi'
+import { usePlaceBet } from '../../hooks/useGameActions'
 
 const Content = () => {
   const [countdown, setCountdown] = useState(0)
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
+  const [betAmount, setBetAmount] = useState(1)
+
+  const placeBetMutation = usePlaceBet()
 
   const { data: gameData, isLoading, isFetching, error, refetch } = useQuery<GameData>({
     queryKey: ['gameData'],
@@ -65,6 +69,18 @@ const Content = () => {
   }, [])
 
   const formattedLeaderboard = gameData?.leaderboard ? formatLeaderboardData(gameData.leaderboard) : []
+
+  const handlePlaceBet = async () => {
+    const guess = Number(userGuess)
+    if (guess >= 0 && guess <= 255 && betAmount > 0) {
+      try {
+        await placeBetMutation.mutateAsync({ guess, amount: betAmount })
+        setUserGuess('') // Clear input after successful bet
+      } catch (error) {
+        // Error is handled in the hook
+      }
+    }
+  }
 
   if (isLoading) {
     return (
@@ -151,11 +167,12 @@ const Content = () => {
             )}
           </div>
 
-          <div className="w-full max-w-xs">
+          <div className="w-full max-w-xs space-y-4">
             <input
               type="number"
               min="0"
-              placeholder={countdown === 0 ? "Betting closed" : "Enter your guess"}
+              max="255"
+              placeholder={countdown === 0 ? "Betting closed" : "Enter your guess (0-255)"}
               value={userGuess}
               onChange={(e) => {
                 const value = e.target.value
@@ -166,6 +183,38 @@ const Content = () => {
               className="w-full ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-3 text-center text-white placeholder-gray-400"
               disabled={countdown === 0}
             />
+            
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-gray-300">Bet Amount:</label>
+              <input
+                type="number"
+                min="1"
+                value={betAmount}
+                onChange={(e) => setBetAmount(Number(e.target.value) || 1)}
+                className="flex-1 ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-2 text-center text-white"
+                disabled={countdown === 0}
+              />
+            </div>
+            
+            <button
+              onClick={handlePlaceBet}
+              disabled={countdown === 0 || !userGuess || placeBetMutation.isPending}
+              className="w-full bg-fpblock hover:bg-fpblock/80 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            >
+              {placeBetMutation.isPending ? 'Placing Bet...' : 'Place Bet'}
+            </button>
+            
+            {placeBetMutation.isError && (
+              <p className="text-xs text-red-400 text-center">
+                Failed to place bet. Please try again.
+              </p>
+            )}
+            
+            {placeBetMutation.isSuccess && (
+              <p className="text-xs text-green-400 text-center">
+                Bet placed successfully!
+              </p>
+            )}
           </div>
           <div className="text-center text-xs text-gray-300 space-y-1">
             <p>Round finishes: {gameData?.current_round_finishes ? new Date(gameData.current_round_finishes).toLocaleTimeString() : 'Loading...'}</p>

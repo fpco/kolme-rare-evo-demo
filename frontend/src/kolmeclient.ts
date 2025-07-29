@@ -33,17 +33,12 @@ const getEncryptionKey = () => {
   return localStorage.getItem('user_encryption_key') || 'user1';
 };
 
-// Set encryption key and regenerate wallet
 export const setEncryptionKey = async (newKey: string) => {
   localStorage.setItem('user_encryption_key', newKey);
-  // Clear the old encrypted key so a new one gets generated
   localStorage.removeItem('your_key');
-  // Reload the page to reinitialize with new key
   window.location.reload();
 };
 
-// You need to figure out how to get and secure this
-// Change this value to simulate different users/wallets
 const encryptionKey = getEncryptionKey();
 
 await generateAndStorePrivateKey(encryptionKey);
@@ -60,7 +55,7 @@ export const getCurrentUser = () => {
   return {
     publicKey: publicKeyHex,
     shortAddress: `${publicKeyHex.slice(0, 6)}...${publicKeyHex.slice(-4)}`,
-    encryptionKey: encryptionKey // This identifies which "user" you are
+    encryptionKey: encryptionKey 
   };
 };
 
@@ -75,7 +70,6 @@ export const claimFunds = async () => {
   return block;
 };
 
-// Place a bet on a number (0-255) with a specific amount
 export const placeBet = async (guess: number, amount: number) => {
   if (guess < 0 || guess > 255) {
     throw new Error('Guess must be between 0 and 255');

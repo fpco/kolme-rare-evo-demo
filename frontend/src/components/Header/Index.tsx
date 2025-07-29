@@ -13,7 +13,7 @@ const Header = () => {
        
         
         <div className="md:bg-black/30 md:p-4 rounded-xl flex items-center space-x-4">
-         {/* Current User Info */}
+         {/* user Info */}
         <div className="hidden md:block text-right">
           <div className="text-sm text-gray-400">Current User</div>
           <div className="text-white font-mono text-xs">{currentUser.shortAddress}</div>

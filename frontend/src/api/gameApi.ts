@@ -40,7 +40,6 @@ export const fetchGameData = async (): Promise<GameData> => {
   return response.json();
 };
 
-// Helper function to format leaderboard data
 export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): FormattedLeaderboardEntry[] => {
   return leaderboard.map((entry, index) => ({
     rank: index + 1,
@@ -51,7 +50,6 @@ export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): Formatte
   }));
 };
 
-// Helper function to calculate countdown from ISO timestamp
 export const calculateCountdown = (finishTime: string): number => {
   const now = new Date().getTime();
   const finish = new Date(finishTime).getTime();

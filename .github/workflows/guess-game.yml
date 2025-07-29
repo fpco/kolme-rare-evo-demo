@@ -22,7 +22,7 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     concurrency:
-      group: ci-${{ github.ref }}
+      group: ci-gg-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4

@@ -32,8 +32,12 @@ struct ServeOpt {
     rng_public_key: PublicKey,
     #[clap(long, env = "VALIDATOR_SECRET_KEY")]
     validator_secret_key: SecretKey,
+    /// Fjall directory. Will be ignored if a PostgreSQL connection string is provided.
     #[clap(long, env = "FJALL_DIR", default_value = "fjall-dir")]
     fjall_dir: PathBuf,
+    /// PostgreSQL connection string, will override a Fjall directory
+    #[clap(long, env = "POSTGRES_CONN_STR")]
+    postgres: Option<String>,
     #[clap(long, env = "BIND", default_value = "[::]:3000")]
     bind: SocketAddr,
 }
@@ -61,6 +65,7 @@ async fn serve(opt: ServeOpt) -> Result<()> {
         rng_public_key,
         validator_secret_key,
         fjall_dir,
+        postgres,
         bind,
     } = opt;
 
@@ -80,7 +85,11 @@ async fn serve(opt: ServeOpt) -> Result<()> {
 
     let game = GuessGame::new(validator_secret_key.public_key(), rng_public_key);
     let mut set = JoinSet::new();
-    let kolme = Kolme::new(game, CODE_VERSION, KolmeStore::new_fjall(&fjall_dir)?).await?;
+    let store = match postgres {
+        Some(postgres) => KolmeStore::new_postgres(&postgres).await?,
+        None => KolmeStore::new_fjall(&fjall_dir)?,
+    };
+    let kolme = Kolme::new(game, CODE_VERSION, store).await?;
     set.spawn(Processor::new(kolme.clone(), validator_secret_key).run());
     set.spawn(ApiServer::new(kolme.clone()).run(bind));
     set.spawn(state_printer(kolme.clone()));

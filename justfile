@@ -1,5 +1,6 @@
 # Rng server module
 mod rng './rng-server/justfile'
+mod game './guess-game/justfile'
 
 # List all recipes
 default:

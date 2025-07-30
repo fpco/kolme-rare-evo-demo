@@ -64,20 +64,6 @@ const Leaderboard = ({ data }: LeaderboardProps) => {
               <div className="w-full flex flex-row flex-wrap justify-between">
                 <div className="flex flex-col">
                   <span className="text-white font-medium">{entry.username}</span>
-                  <button
-                    type="button"
-                    className={`text-xs md:truncate max-w-32 text-left truncate transition-colors cursor-pointer ${
-                      copiedWalletId === entry.walletId
-                        ? 'text-green-400'
-                        : 'text-gray-400 hover:text-gray-300'
-                    }`}
-                    onClick={() => handleCopyWalletId(entry.walletId)}
-                    title="Click to copy wallet ID"
-                  >
-                    {copiedWalletId === entry.walletId
-                      ? 'Copied!'
-                      : entry.walletId}
-                  </button>
                 </div>
                 <div className="text-right flex items-baseline gap-1">
                   <div className="text-fpblock font-bold">

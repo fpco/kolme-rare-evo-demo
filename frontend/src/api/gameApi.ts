@@ -41,10 +41,25 @@ export const fetchGameData = async (): Promise<GameData> => {
 };
 
 export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): FormattedLeaderboardEntry[] => {
-  return leaderboard.map((entry, index) => ({
+  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
+    const pointsA = Math.round(parseFloat(a.winnings) * 100);
+    const pointsB = Math.round(parseFloat(b.winnings) * 100);
+    
+    // Sort by points descending first
+    if (pointsB !== pointsA) {
+      return pointsB - pointsA;
+    }
+    
+    // If points are equal, sort by account numerically for stable ordering
+    const accountA = parseInt(String(a.account)) || 0;
+    const accountB = parseInt(String(b.account)) || 0;
+    return accountA - accountB;
+  });
+
+  return sortedLeaderboard.map((entry, index) => ({
     rank: index + 1,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.account}`,
-    username: `Player_${entry.account}`,
+    username: `Player #${entry.account}`,
     walletId: entry.account,
     points: Math.round(parseFloat(entry.winnings) * 100), // Convert to points (multiply by 100 for display)
   }));

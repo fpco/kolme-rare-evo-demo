@@ -6,22 +6,39 @@ import Leaderboard from '../Leaderboard/Index'
 import { fetchGameData, formatLeaderboardData, calculateCountdown, type GameData } from '../../api/gameApi'
 import { usePlaceBet } from '../../hooks/useGameActions'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
+import { getUserFunds, hasSufficientFunds } from '../../kolmeclient'
 
 const Content = () => {
   const [countdown, setCountdown] = useState(0)
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
   const [betAmount, setBetAmount] = useState('1')
+  const [, setRefresh] = useState(0)
 
   const placeBetMutation = usePlaceBet()
   
   useAutoDismiss(placeBetMutation, 4000)
+
+  // Listen for funds updates to refresh the component
+  useEffect(() => {
+    const handleFundsUpdate = () => {
+      setRefresh(prev => prev + 1)
+    }
+
+    window.addEventListener('fundsUpdated', handleFundsUpdate)
+    return () => window.removeEventListener('fundsUpdated', handleFundsUpdate)
+  }, [])
 
   const { data: gameData, isLoading, isFetching, error, refetch } = useQuery<GameData>({
     queryKey: ['gameData'],
     queryFn: fetchGameData,
     staleTime: 0,
   })
+
+  // Update funds display when gameData changes (might indicate funds were updated)
+  useEffect(() => {
+    // Force re-render to update funds display
+  }, [gameData])
 
   useEffect(() => {
     if (gameData?.current_round_finishes) {
@@ -76,7 +93,13 @@ const Content = () => {
   const handlePlaceBet = async () => {
     const guess = Number(userGuess)
     const amount = Number(betAmount)
+    
     if (guess >= 0 && guess <= 255 && amount > 0) {
+      if (!hasSufficientFunds(amount)) {
+        alert(`Insufficient funds! You have ${getUserFunds()} funds but need ${amount}`)
+        return
+      }
+      
       try {
         await placeBetMutation.mutateAsync({ guess, amount })
         setUserGuess('') // Clear input after successful bet
@@ -95,6 +118,9 @@ const Content = () => {
     }
     if (placeBetMutation.isError) {
       return 'Failed - Retry';
+    }
+    if (betAmount && !hasSufficientFunds(Number(betAmount))) {
+      return `Insufficient Funds (Need ${Number(betAmount)})`;
     }
     return 'Place Bet';
   };
@@ -231,7 +257,7 @@ const Content = () => {
             
             <button
               onClick={handlePlaceBet}
-              disabled={countdown === 0 || !userGuess || !betAmount || Number(betAmount) <= 0 || placeBetMutation.isPending || placeBetMutation.isSuccess}
+              disabled={countdown === 0 || !userGuess || !betAmount || Number(betAmount) <= 0 || !hasSufficientFunds(Number(betAmount) || 0) || placeBetMutation.isPending || placeBetMutation.isSuccess}
               className={getPlaceBetButtonClassName()}
             >
               {getPlaceBetButtonText()}

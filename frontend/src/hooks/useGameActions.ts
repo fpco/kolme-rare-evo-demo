@@ -3,6 +3,7 @@ import { placeBet, claimFunds, type PlaceBetParams } from '../api/gameApi';
 import { setFundsClaimed, subtractFunds } from '../kolmeclient';
 
 // Wrapper function that assumes success after timeout and updates localStorage accordingly
+// This is because we dont receive a success response
 const withTimeoutForClaimFunds = (
   fn: () => Promise<any>,
   timeoutMs: number = 2500
@@ -15,7 +16,6 @@ const withTimeoutForClaimFunds = (
         if (!completed) {
           completed = true;
           console.log('Claim funds assumed successful after timeout');
-          // Update localStorage to mark funds as claimed
           setFundsClaimed();
           resolve({});
         }
@@ -52,7 +52,6 @@ const withTimeoutForPlaceBet = (
         if (!completed) {
           completed = true;
           console.log('Place bet assumed successful after timeout');
-          // Update localStorage to subtract funds
           try {
             subtractFunds(params.amount);
             resolve({});

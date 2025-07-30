@@ -33,7 +33,6 @@ const generateRandomUserKey = () => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
-// Get or generate user key
 const getUserKey = () => {
   let userKey = localStorage.getItem('userKey');
   if (!userKey) {
@@ -46,13 +45,11 @@ const getUserKey = () => {
   return userKey;
 };
 
-// Check if user has already claimed funds
 export const hasClaimedFunds = () => {
   const userKey = getUserKey();
   return localStorage.getItem(`hasClaimedFunds_${userKey}`) === 'true';
 };
 
-// Set that user has claimed funds and add 100 to their balance
 export const setFundsClaimed = () => {
   const userKey = getUserKey();
   localStorage.setItem(`hasClaimedFunds_${userKey}`, 'true');
@@ -63,13 +60,11 @@ export const setFundsClaimed = () => {
   window.dispatchEvent(new CustomEvent('fundsUpdated'));
 };
 
-// Get user's current funds amount
 export const getUserFunds = () => {
   const userKey = getUserKey();
   return parseInt(localStorage.getItem(`fundsAmount_${userKey}`) || '0');
 };
 
-// Subtract funds after betting
 export const subtractFunds = (amount: number) => {
   const userKey = getUserKey();
   const currentFunds = getUserFunds();
@@ -78,11 +73,9 @@ export const subtractFunds = (amount: number) => {
   }
   localStorage.setItem(`fundsAmount_${userKey}`, (currentFunds - amount).toString());
   
-  // Dispatch event to notify components about funds update
   window.dispatchEvent(new CustomEvent('fundsUpdated'));
 };
 
-// Check if user has sufficient funds
 export const hasSufficientFunds = (amount: number) => {
   return getUserFunds() >= amount;
 };
@@ -96,7 +89,6 @@ export const getPublicKey = () => {
   return client.getPublicKey(privateKey);
 };
 
-// Get current user info (public key as identifier)
 export const getCurrentUser = () => {
   const publicKey = client.getPublicKey(privateKey);
   const publicKeyHex = Buffer.from(publicKey).toString('hex');
@@ -121,7 +113,6 @@ export const claimFunds = async () => {
       }
   }]);
   
-  // Mark funds as claimed and add 100 to balance
   setFundsClaimed();
   
   return block;
@@ -145,7 +136,6 @@ export const placeBet = async (guess: number, amount: number) => {
     }
   }]);
   
-  // Subtract funds from local storage after successful bet
   subtractFunds(amount);
   
   return block;

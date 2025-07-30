@@ -19,7 +19,6 @@ const Content = () => {
   
   useAutoDismiss(placeBetMutation, 4000)
 
-  // Listen for funds updates to refresh the component
   useEffect(() => {
     const handleFundsUpdate = () => {
       setRefresh(prev => prev + 1)
@@ -35,7 +34,6 @@ const Content = () => {
     staleTime: 0,
   })
 
-  // Update funds display when gameData changes (might indicate funds were updated)
   useEffect(() => {
     // Force re-render to update funds display
   }, [gameData])

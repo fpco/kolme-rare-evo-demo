@@ -45,7 +45,6 @@ export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): Formatte
     const pointsA = Math.round(parseFloat(a.winnings) * 100);
     const pointsB = Math.round(parseFloat(b.winnings) * 100);
     
-    // Sort by points descending first
     if (pointsB !== pointsA) {
       return pointsB - pointsA;
     }
@@ -61,7 +60,7 @@ export const formatLeaderboardData = (leaderboard: LeaderboardEntry[]): Formatte
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.account}`,
     username: `Player #${entry.account}`,
     walletId: entry.account,
-    points: Math.round(parseFloat(entry.winnings) * 100), // Convert to points (multiply by 100 for display)
+    points: Math.round(parseFloat(entry.winnings) * 100), // Multiply by 100 for display
   }));
 };
 

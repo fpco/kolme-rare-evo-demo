@@ -15,17 +15,7 @@ use rust_decimal::prelude::Zero;
 use tokio::task::JoinSet;
 
 #[derive(clap::Parser)]
-#[allow(clippy::large_enum_variant)]
-enum Cmd {
-    GenKeypair,
-    Serve {
-        #[clap(flatten)]
-        opt: ServeOpt,
-    },
-}
-
-#[derive(clap::Parser)]
-struct ServeOpt {
+struct Opt {
     #[clap(
         long,
         env = "RNG_SERVER",
@@ -52,23 +42,11 @@ struct ServeOpt {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    match Cmd::parse() {
-        Cmd::GenKeypair => gen_keypair(),
-        Cmd::Serve { opt } => serve(opt).await?,
-    }
-
-    Ok(())
+    serve(Opt::parse()).await
 }
 
-fn gen_keypair() {
-    let secret = SecretKey::random();
-    let public = secret.public_key();
-    println!("Public key: {public}");
-    println!("Secret key: {}", secret.reveal_as_hex());
-}
-
-async fn serve(opt: ServeOpt) -> Result<()> {
-    let ServeOpt {
+async fn serve(opt: Opt) -> Result<()> {
+    let Opt {
         rng_server,
         rng_public_key,
         validator_secret_key,

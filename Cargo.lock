@@ -729,6 +729,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
 
 [[package]]
+name = "bimap"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "230c5f1ca6a325a32553f8640d31ac9b49f2411e901e427570154868b46da4f7"
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3203,7 +3209,7 @@ dependencies = [
 [[package]]
 name = "kolme"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=4bb36b84b611cab535723365d3aace501d0d5100#4bb36b84b611cab535723365d3aace501d0d5100"
+source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
 dependencies = [
  "anyhow",
  "axum 0.8.4",
@@ -3241,7 +3247,7 @@ dependencies = [
 [[package]]
 name = "kolme-solana-bridge-client"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=4bb36b84b611cab535723365d3aace501d0d5100#4bb36b84b611cab535723365d3aace501d0d5100"
+source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
 dependencies = [
  "borsh",
  "shared",
@@ -3258,7 +3264,7 @@ dependencies = [
 [[package]]
 name = "kolme-store"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=4bb36b84b611cab535723365d3aace501d0d5100#4bb36b84b611cab535723365d3aace501d0d5100"
+source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
 dependencies = [
  "anyhow",
  "enum_dispatch",
@@ -3308,10 +3314,13 @@ dependencies = [
  "futures-timer",
  "getrandom 0.2.16",
  "libp2p-allow-block-list",
+ "libp2p-autonat",
  "libp2p-connection-limits",
  "libp2p-core",
+ "libp2p-dcutr",
  "libp2p-dns",
  "libp2p-gossipsub",
+ "libp2p-identify",
  "libp2p-identity",
  "libp2p-kad",
  "libp2p-mdns",
@@ -3319,6 +3328,8 @@ dependencies = [
  "libp2p-noise",
  "libp2p-ping",
  "libp2p-quic",
+ "libp2p-relay",
+ "libp2p-rendezvous",
  "libp2p-request-response",
  "libp2p-swarm",
  "libp2p-tcp",
@@ -3339,6 +3350,31 @@ dependencies = [
  "libp2p-core",
  "libp2p-identity",
  "libp2p-swarm",
+]
+
+[[package]]
+name = "libp2p-autonat"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fab5e25c49a7d48dac83d95d8f3bac0a290d8a5df717012f6e34ce9886396c0b"
+dependencies = [
+ "async-trait",
+ "asynchronous-codec",
+ "either",
+ "futures",
+ "futures-bounded",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-request-response",
+ "libp2p-swarm",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "rand 0.8.5",
+ "rand_core 0.6.4",
+ "thiserror 2.0.12",
+ "tracing",
+ "web-time",
 ]
 
 [[package]]
@@ -3374,6 +3410,28 @@ dependencies = [
  "thiserror 2.0.12",
  "tracing",
  "unsigned-varint 0.8.0",
+ "web-time",
+]
+
+[[package]]
+name = "libp2p-dcutr"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f4f0eec23bc79cabfdf6934718f161fc42a1d98e2c9d44007c80eb91534200c"
+dependencies = [
+ "asynchronous-codec",
+ "either",
+ "futures",
+ "futures-bounded",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "lru 0.12.5",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "thiserror 2.0.12",
+ "tracing",
  "web-time",
 ]
 
@@ -3421,6 +3479,27 @@ dependencies = [
  "sha2 0.10.9",
  "tracing",
  "web-time",
+]
+
+[[package]]
+name = "libp2p-identify"
+version = "0.47.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ab792a8b68fdef443a62155b01970c81c3aadab5e659621b063ef252a8e65e8"
+dependencies = [
+ "asynchronous-codec",
+ "either",
+ "futures",
+ "futures-bounded",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "smallvec",
+ "thiserror 2.0.12",
+ "tracing",
 ]
 
 [[package]]
@@ -3497,10 +3576,13 @@ checksum = "805a555148522cb3414493a5153451910cb1a146c53ffbf4385708349baf62b7"
 dependencies = [
  "futures",
  "libp2p-core",
+ "libp2p-dcutr",
  "libp2p-gossipsub",
+ "libp2p-identify",
  "libp2p-identity",
  "libp2p-kad",
  "libp2p-ping",
+ "libp2p-relay",
  "libp2p-swarm",
  "pin-project",
  "prometheus-client",
@@ -3566,6 +3648,53 @@ dependencies = [
  "thiserror 2.0.12",
  "tokio",
  "tracing",
+]
+
+[[package]]
+name = "libp2p-relay"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "551b24ae04c63859bf5e25644acdd6aa469deb5c5cd872ca21c2c9b45a5a5192"
+dependencies = [
+ "asynchronous-codec",
+ "bytes",
+ "either",
+ "futures",
+ "futures-bounded",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-swarm",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "rand 0.8.5",
+ "static_assertions",
+ "thiserror 2.0.12",
+ "tracing",
+ "web-time",
+]
+
+[[package]]
+name = "libp2p-rendezvous"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15285d828c2b4a34cb660c2e74cd6938116daceab1f4357bae933d5b08cca933"
+dependencies = [
+ "async-trait",
+ "asynchronous-codec",
+ "bimap",
+ "futures",
+ "futures-timer",
+ "libp2p-core",
+ "libp2p-identity",
+ "libp2p-request-response",
+ "libp2p-swarm",
+ "quick-protobuf",
+ "quick-protobuf-codec",
+ "rand 0.8.5",
+ "thiserror 2.0.12",
+ "tracing",
+ "web-time",
 ]
 
 [[package]]
@@ -3860,7 +3989,7 @@ dependencies = [
 [[package]]
 name = "merkle-map"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=4bb36b84b611cab535723365d3aace501d0d5100#4bb36b84b611cab535723365d3aace501d0d5100"
+source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
 dependencies = [
  "arrayvec",
  "base64 0.22.1",
@@ -5786,7 +5915,7 @@ dependencies = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=4bb36b84b611cab535723365d3aace501d0d5100#4bb36b84b611cab535723365d3aace501d0d5100"
+source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
 dependencies = [
  "borsh",
  "cosmwasm-std",

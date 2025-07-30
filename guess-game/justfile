@@ -7,7 +7,7 @@ default:
 
 # Run application
 serve:
-    cargo run serve \
+    cargo run -- \
         --validator-secret-key 20bf4ba70b9ea4525af3f19bcd16ae8c3b0dc70748669b3cce466d17e30e5c37
 
 # Test grab funds

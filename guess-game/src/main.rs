@@ -2,6 +2,7 @@ mod api;
 mod app;
 mod bot;
 mod cli;
+mod indexer;
 mod rng_server;
 mod state;
 mod time;
@@ -12,6 +13,7 @@ use app::GuessGame;
 use bot::bot;
 use clap::Parser;
 use cli::Opt;
+use indexer::Indexer;
 use kolme::*;
 use tokio::task::JoinSet;
 
@@ -56,8 +58,12 @@ async fn serve(opt: Opt) -> Result<()> {
     // The processor is responsible for receiving incoming transactions and producing blocks.
     set.spawn(Processor::new(kolme.clone(), validator_secret_key).run());
 
+    let indexer = Indexer::new(kolme.clone());
+    let indexer_lock = indexer.get_state().clone();
+    set.spawn(indexer.run());
+
     // The API server provides an HTTP API for the frontend to interact with the chain.
-    set.spawn(make_api_server(kolme.clone()).run(bind));
+    set.spawn(make_api_server(kolme.clone(), indexer_lock).run(bind));
 
     // The bot is responsible for periodically checking for new random numbers and
     // updating the chain.

@@ -5,7 +5,7 @@ use kolme::*;
 
 use crate::{
     rng_server::RngResult,
-    state::{GuessState, LastWinner, Wager},
+    state::{GuessState, Wager},
     time::GuessTimestamp,
 };
 
@@ -61,7 +61,6 @@ impl KolmeApp for GuessGame {
             rng_public_key: self.rng_public_key,
             received_funds: MerkleMap::new(),
             pending_wagers: MerkleMap::new(),
-            last_winner: None,
         })
     }
 
@@ -139,18 +138,17 @@ impl KolmeApp for GuessGame {
 
                 let mut winnings = BTreeMap::new();
 
+                ctx.log_json(&GuessGameLog::NewWinner {
+                    finished: timestamp,
+                    number,
+                })?;
+
                 for (winner, weight) in winning_weights {
                     let amount = total_bet * weight / total_weight;
                     ctx.log_json(&GuessGameLog::Winnings { winner, amount })?;
                     ctx.mint_asset(ASSET_ID, winner, amount)?;
                     winnings.insert(winner, amount);
                 }
-
-                ctx.app_state_mut().last_winner = Some(LastWinner {
-                    finished: timestamp.try_into()?,
-                    number,
-                    winnings,
-                });
             }
         }
 
@@ -161,5 +159,12 @@ impl KolmeApp for GuessGame {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GuessGameLog {
-    Winnings { winner: AccountId, amount: Decimal },
+    NewWinner {
+        finished: GuessTimestamp,
+        number: u8,
+    },
+    Winnings {
+        winner: AccountId,
+        amount: Decimal,
+    },
 }

@@ -1,52 +1,117 @@
-use std::sync::Arc;
+use std::{
+    collections::{BTreeMap, HashMap},
+    sync::Arc,
+};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use kolme::*;
+use tokio::sync::RwLock;
 
-pub struct Indexer<App: KolmeApp, Store> {
-    kolme: Kolme<App>,
-    store: Store,
+use crate::app::{GuessGame, GuessGameLog};
+
+pub type IndexerStateLock = Arc<RwLock<IndexerState>>;
+
+#[derive(Default, Clone)]
+pub struct IndexerState {
+    pub last_winner: Option<LastWinner>,
+    pub leaderboard: Vec<LeaderboardEntry>,
+    pub total_winnings: HashMap<AccountId, Decimal>,
 }
 
-pub trait IndexerStore {
-    async fn next_to_index(&mut self) -> Result<BlockHeight>;
-    async fn add_block<AppMessage>(
-        &mut self,
-        block: &SignedBlock<AppMessage>,
-        logs: &[Vec<String>],
-    ) -> Result<()>;
+#[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct LastWinner {
+    pub finished: Timestamp,
+    pub number: u8,
+    pub winnings: BTreeMap<AccountId, Decimal>,
 }
 
-pub struct IndexerMemoryStore<State> {
-    next_to_index: BlockHeight,
-    state: Arc<parking_lot::RwLock<Arc<State>>>,
+#[derive(serde::Serialize, Clone, Copy)]
+pub struct LeaderboardEntry {
+    pub account: AccountId,
+    pub winnings: Decimal,
 }
 
-impl<State> IndexerStore for IndexerMemoryStore<State> {
-    async fn next_to_index(&mut self) -> Result<BlockHeight> {
-        Ok(self.next_to_index)
+pub struct Indexer {
+    kolme: Kolme<GuessGame>,
+    state: IndexerStateLock,
+}
+
+impl Indexer {
+    pub fn new(kolme: Kolme<GuessGame>) -> Self {
+        Indexer {
+            kolme,
+            state: Arc::new(RwLock::new(IndexerState::default())),
+        }
     }
 
-    async fn add_block<AppMessage>(
-        &mut self,
-        block: &SignedBlock<AppMessage>,
-        logs: &[Vec<String>],
-    ) -> Result<()> {
-        anyhow::ensure!(self.next_to_index == block.height());
-        let mut state = Arc::unwrap_or_clone(self.state.read().clone());
-        state.add_block(block, logs).await?;
-        *self.state.write() = Arc::new(state);
-        self.next_to_index = self.next_to_index.next();
-        Ok(())
+    pub fn get_state(&self) -> &IndexerStateLock {
+        &self.state
+    }
+
+    pub async fn run(self) -> Result<()> {
+        let mut next_to_index = BlockHeight::start();
+        loop {
+            match self.run_once(next_to_index).await {
+                Err(e) => {
+                    eprintln!("Error while updating indexer for height {next_to_index}: {e}");
+                }
+                Ok(state) => {
+                    *self.state.write().await = state;
+                    next_to_index = next_to_index.next();
+                }
+            }
+        }
+    }
+
+    async fn run_once(&self, height: BlockHeight) -> Result<IndexerState> {
+        let block = self.kolme.wait_for_block(height).await?;
+        let logs = self.kolme.load_logs(block.as_inner().logs).await?;
+        let mut state = (*self.state.read().await).clone();
+        update(&mut state, &logs)?;
+        Ok(state)
     }
 }
 
-pub trait IndexerState<App: KolmeApp> {
-    async fn add_block(
-        &mut self,
-        block: &SignedBlock<App::Message>,
-        logs: &[Vec<String>],
-    ) -> Result<()>;
-}
+fn update(state: &mut IndexerState, logs: &[Vec<String>]) -> Result<()> {
+    let mut new_winner = None;
+    for log in logs.iter().flat_map(|v| v.iter()) {
+        if let Ok(log) = serde_json::from_str::<GuessGameLog>(log) {
+            match log {
+                GuessGameLog::NewWinner { finished, number } => {
+                    assert_eq!(new_winner, None);
+                    new_winner = Some(LastWinner {
+                        finished: finished.try_into()?,
+                        number,
+                        winnings: BTreeMap::new(),
+                    });
+                }
+                GuessGameLog::Winnings { winner, amount } => {
+                    *state.total_winnings.entry(winner).or_default() += amount;
 
-impl<App, Store> Indexer<App, Store> {}
+                    let new_winner = new_winner
+                        .as_mut()
+                        .context("update: impossible None for new_winner")?;
+                    let old = new_winner.winnings.insert(winner, amount);
+                    assert_eq!(old, None);
+                }
+            }
+        }
+    }
+
+    if new_winner.is_some() {
+        state.last_winner = new_winner;
+    }
+
+    let mut winners = state
+        .total_winnings
+        .iter()
+        .map(|(account, winnings)| LeaderboardEntry {
+            account: *account,
+            winnings: *winnings,
+        })
+        .collect::<Vec<_>>();
+    winners.sort_by(|x, y| y.winnings.cmp(&x.winnings));
+    state.leaderboard = winners.into_iter().take(10).collect();
+
+    Ok(())
+}

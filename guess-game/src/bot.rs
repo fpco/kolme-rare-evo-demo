@@ -30,7 +30,7 @@ async fn bot_once(
     else {
         return Ok(());
     };
-    let timestamp = Timestamp::try_from(guess_timestamp)?;
+    let timestamp = Timestamp::from(guess_timestamp);
     if timestamp > Timestamp::now() {
         return Ok(());
     }

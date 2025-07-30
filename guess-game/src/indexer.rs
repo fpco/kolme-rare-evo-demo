@@ -3,7 +3,7 @@ use std::{
     sync::Arc,
 };
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use kolme::*;
 use tokio::sync::RwLock;
 
@@ -67,12 +67,12 @@ impl Indexer {
         let block = self.kolme.wait_for_block(height).await?;
         let logs = self.kolme.load_logs(block.as_inner().logs).await?;
         let mut state = (*self.state.read().await).clone();
-        update(&mut state, &logs)?;
+        update(&mut state, &logs);
         Ok(state)
     }
 }
 
-fn update(state: &mut IndexerState, logs: &[Vec<String>]) -> Result<()> {
+fn update(state: &mut IndexerState, logs: &[Vec<String>]) {
     let mut new_winner = None;
     for log in logs.iter().flat_map(|v| v.iter()) {
         if let Ok(log) = serde_json::from_str::<GuessGameLog>(log) {
@@ -80,7 +80,7 @@ fn update(state: &mut IndexerState, logs: &[Vec<String>]) -> Result<()> {
                 GuessGameLog::NewWinner { finished, number } => {
                     assert_eq!(new_winner, None);
                     new_winner = Some(LastWinner {
-                        finished: finished.try_into()?,
+                        finished: finished.into(),
                         number,
                         winnings: BTreeMap::new(),
                     });
@@ -90,7 +90,7 @@ fn update(state: &mut IndexerState, logs: &[Vec<String>]) -> Result<()> {
 
                     let new_winner = new_winner
                         .as_mut()
-                        .context("update: impossible None for new_winner")?;
+                        .expect("update: impossible None for new_winner");
                     let old = new_winner.winnings.insert(winner, amount);
                     assert_eq!(old, None);
                 }
@@ -112,6 +112,4 @@ fn update(state: &mut IndexerState, logs: &[Vec<String>]) -> Result<()> {
         .collect::<Vec<_>>();
     winners.sort_by(|x, y| y.winnings.cmp(&x.winnings));
     state.leaderboard = winners.into_iter().take(10).collect();
-
-    Ok(())
 }

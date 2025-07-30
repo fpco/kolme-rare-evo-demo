@@ -1,9 +1,7 @@
-use anyhow::Result;
 use kolme::{
-    axum::{Json, Router, extract::State, response::IntoResponse, routing::get},
+    axum::{Json, Router, extract::State, routing::get},
     *,
 };
-use reqwest::StatusCode;
 use rust_decimal::prelude::Zero;
 
 use crate::{
@@ -12,6 +10,7 @@ use crate::{
     time::GuessTimestamp,
 };
 
+/// Make an ApiServer that includes our app-specific /guess-game endpoint.
 pub fn make_api_server(kolme: Kolme<GuessGame>, indexer: IndexerStateLock) -> ApiServer<GuessGame> {
     let route_state = RouteState {
         kolme: kolme.clone(),
@@ -28,16 +27,7 @@ struct RouteState {
 
 fn make_extra_routes(route_state: RouteState) -> Router {
     Router::new()
-        .route(
-            "/guess-game",
-            get(|kolme| async {
-                guess_game_data(kolme).await.map_err(|e| {
-                    let mut res = e.to_string().into_response();
-                    *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
-                    res
-                })
-            }),
-        )
+        .route("/guess-game", get(guess_game_data))
         .with_state(route_state)
 }
 
@@ -49,12 +39,12 @@ struct GuessGameData {
     leaderboard: Vec<LeaderboardEntry>,
 }
 
-async fn guess_game_data(State(route_state): State<RouteState>) -> Result<Json<GuessGameData>> {
+async fn guess_game_data(State(route_state): State<RouteState>) -> Json<GuessGameData> {
     let RouteState { kolme, indexer } = route_state;
     let indexer_state = indexer.read().await;
     let current_round = GuessTimestamp::after(Timestamp::now());
-    Ok(Json(GuessGameData {
-        current_round_finishes: current_round.try_into()?,
+    Json(GuessGameData {
+        current_round_finishes: current_round.into(),
         current_bets: kolme
             .read()
             .get_app_state()
@@ -65,5 +55,5 @@ async fn guess_game_data(State(route_state): State<RouteState>) -> Result<Json<G
             }),
         last_winner: indexer_state.last_winner.clone(),
         leaderboard: indexer_state.leaderboard.clone(),
-    }))
+    })
 }

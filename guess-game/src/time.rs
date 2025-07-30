@@ -38,22 +38,16 @@ impl Display for GuessTimestamp {
     }
 }
 
-impl TryFrom<&GuessTimestamp> for Timestamp {
-    type Error = anyhow::Error;
-
-    fn try_from(
-        GuessTimestamp(minutes): &GuessTimestamp,
-    ) -> std::result::Result<Self, Self::Error> {
+impl From<&GuessTimestamp> for Timestamp {
+    fn from(GuessTimestamp(minutes): &GuessTimestamp) -> Self {
         let seconds = minutes * 60;
-        Ok(Timestamp::from_second(i64::try_from(seconds)?)?)
+        Timestamp::from_second(seconds as i64).unwrap()
     }
 }
 
-impl TryFrom<GuessTimestamp> for Timestamp {
-    type Error = anyhow::Error;
-
-    fn try_from(value: GuessTimestamp) -> Result<Self, Self::Error> {
-        Timestamp::try_from(&value)
+impl From<GuessTimestamp> for Timestamp {
+    fn from(value: GuessTimestamp) -> Self {
+        Timestamp::from(&value)
     }
 }
 

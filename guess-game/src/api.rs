@@ -31,11 +31,16 @@ fn make_extra_routes(route_state: RouteState) -> Router {
         .with_state(route_state)
 }
 
+/// Data returned from the /guess-game endpoint.
 #[derive(serde::Serialize)]
 struct GuessGameData {
+    /// When the current round of betting will finish.
     current_round_finishes: Timestamp,
+    /// Sum total of the current bets for this round of betting.
     current_bets: Decimal,
+    /// The last settled round.
     last_winner: Option<LastWinner>,
+    /// The top 10 participants of all time.
     leaderboard: Vec<LeaderboardEntry>,
 }
 

@@ -1,9 +1,17 @@
-use std::{collections::HashMap, net::SocketAddr, path::PathBuf};
+use std::{
+    collections::{BTreeMap, HashMap},
+    net::SocketAddr,
+    path::PathBuf,
+};
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use kolme::*;
-use reqwest::Url;
+use kolme::{
+    axum::{Json, Router, extract::State, response::IntoResponse, routing::get},
+    *,
+};
+use reqwest::{StatusCode, Url};
+use rust_decimal::prelude::Zero;
 use tokio::task::JoinSet;
 
 #[derive(clap::Parser)]
@@ -91,10 +99,13 @@ async fn serve(opt: ServeOpt) -> Result<()> {
     };
     let kolme = Kolme::new(game, CODE_VERSION, store).await?;
     set.spawn(Processor::new(kolme.clone(), validator_secret_key).run());
-    set.spawn(ApiServer::new(kolme.clone()).run(bind));
+    set.spawn(
+        ApiServer::new(kolme.clone())
+            .with_extra_routes(make_extra_routes(kolme.clone()))
+            .run(bind),
+    );
     set.spawn(state_printer(kolme.clone()));
     set.spawn(settler(kolme.clone(), client, rng_server));
-    set.spawn(leaderboard(kolme));
 
     set.join_next()
         .await
@@ -171,6 +182,14 @@ impl TryFrom<&GuessTimestamp> for Timestamp {
     }
 }
 
+impl TryFrom<GuessTimestamp> for Timestamp {
+    type Error = anyhow::Error;
+
+    fn try_from(value: GuessTimestamp) -> Result<Self, Self::Error> {
+        Timestamp::try_from(&value)
+    }
+}
+
 impl TryFrom<i64> for GuessTimestamp {
     type Error = anyhow::Error;
 
@@ -184,6 +203,7 @@ struct GuessState {
     rng_public_key: PublicKey,
     received_funds: MerkleMap<AccountId, BlockHeight>,
     pending_wagers: MerkleMap<GuessTimestamp, MerkleVec<Wager>>,
+    last_winner: Option<LastWinner>,
 }
 
 #[derive(Debug, Clone)]
@@ -202,10 +222,12 @@ impl MerkleSerialize for GuessState {
             rng_public_key,
             received_funds,
             pending_wagers,
+            last_winner,
         } = self;
         serializer.store(rng_public_key)?;
         serializer.store(received_funds)?;
         serializer.store(pending_wagers)?;
+        serializer.store(last_winner)?;
         Ok(())
     }
 }
@@ -219,6 +241,7 @@ impl MerkleDeserialize for GuessState {
             rng_public_key: deserializer.load()?,
             received_funds: deserializer.load()?,
             pending_wagers: deserializer.load()?,
+            last_winner: deserializer.load()?,
         })
     }
 }
@@ -279,6 +302,7 @@ impl KolmeApp for GuessGame {
             rng_public_key: self.rng_public_key,
             received_funds: MerkleMap::new(),
             pending_wagers: MerkleMap::new(),
+            last_winner: None,
         })
     }
 
@@ -354,11 +378,23 @@ impl KolmeApp for GuessGame {
                     total_weight += amount;
                 }
 
+                let mut winnings = BTreeMap::new();
+
                 for (winner, weight) in winning_weights {
-                    let winnings = total_bet * weight / total_weight;
-                    ctx.log_json(&WinningsMessage { winner, winnings })?;
-                    ctx.mint_asset(ASSET_ID, winner, winnings)?;
+                    let amount = total_bet * weight / total_weight;
+                    ctx.log_json(&WinningsMessage {
+                        winner,
+                        winnings: amount,
+                    })?;
+                    ctx.mint_asset(ASSET_ID, winner, amount)?;
+                    winnings.insert(winner, amount);
                 }
+
+                ctx.app_state_mut().last_winner = Some(LastWinner {
+                    finished: timestamp.try_into()?,
+                    number,
+                    winnings,
+                });
             }
         }
 
@@ -471,38 +507,113 @@ struct WinningsMessage {
     winnings: Decimal,
 }
 
-async fn leaderboard(kolme: Kolme<GuessGame>) -> Result<()> {
+fn make_extra_routes(kolme: Kolme<GuessGame>) -> Router {
+    Router::new()
+        .route(
+            "/guess-game",
+            get(|kolme| async {
+                guess_game_data(kolme).await.map_err(|e| {
+                    let mut res = e.to_string().into_response();
+                    *res.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+                    res
+                })
+            }),
+        )
+        .with_state(kolme)
+}
+
+#[derive(serde::Serialize)]
+struct GuessGameData {
+    current_round_finishes: Timestamp,
+    current_bets: Decimal,
+    last_winner: Option<LastWinner>,
+    leaderboard: Vec<LeaderboardEntry>,
+}
+
+#[derive(serde::Serialize, Debug, Clone)]
+struct LastWinner {
+    finished: Timestamp,
+    number: u8,
+    winnings: BTreeMap<AccountId, Decimal>,
+}
+
+impl MerkleSerialize for LastWinner {
+    fn merkle_serialize(&self, serializer: &mut MerkleSerializer) -> Result<(), MerkleSerialError> {
+        let Self {
+            finished,
+            number,
+            winnings,
+        } = self;
+        serializer.store(finished)?;
+        serializer.store(number)?;
+        serializer.store(winnings)?;
+        Ok(())
+    }
+}
+
+impl MerkleDeserialize for LastWinner {
+    fn merkle_deserialize(
+        deserializer: &mut MerkleDeserializer,
+        _version: usize,
+    ) -> Result<Self, MerkleSerialError> {
+        Ok(Self {
+            finished: deserializer.load()?,
+            number: deserializer.load()?,
+            winnings: deserializer.load()?,
+        })
+    }
+}
+
+#[derive(serde::Serialize)]
+struct LeaderboardEntry {
+    account: AccountId,
+    winnings: Decimal,
+}
+
+async fn guess_game_data(State(kolme): State<Kolme<GuessGame>>) -> Result<Json<GuessGameData>> {
+    let current_round = GuessTimestamp::after(Timestamp::now());
+    Ok(Json(GuessGameData {
+        current_round_finishes: current_round.try_into()?,
+        current_bets: kolme
+            .read()
+            .get_app_state()
+            .pending_wagers
+            .get(&current_round)
+            .map_or_else(Decimal::zero, |wagers| {
+                wagers.iter().map(|w| w.amount).sum()
+            }),
+        last_winner: kolme.read().get_app_state().last_winner.clone(),
+        leaderboard: leaderboard(&kolme).await?,
+    }))
+}
+
+// It's really inefficient to process every block on each request.
+// But we can still do it! Caching or using a database would all be
+// improvements.
+async fn leaderboard(kolme: &Kolme<GuessGame>) -> Result<Vec<LeaderboardEntry>> {
     let mut totals = HashMap::<AccountId, Decimal>::new();
-    let mut next_height = BlockHeight::start();
-    let mut recv = kolme.subscribe();
-    loop {
-        match kolme.get_block(next_height).await? {
-            None => {
-                recv.recv().await?;
-                continue;
-            }
-            Some(block) => {
-                for logs in &*block.logs {
-                    for log in logs {
-                        match serde_json::from_str(log) {
-                            Err(_) => continue,
-                            Ok(WinningsMessage { winner, winnings }) => {
-                                *totals.entry(winner).or_default() += winnings;
-                            }
-                        }
+    for height in BlockHeight::start().0..kolme.read().get_next_height().0 {
+        let height = BlockHeight(height);
+        let block = kolme
+            .get_block(height)
+            .await?
+            .context("Missing an expected block")?;
+        for logs in &*block.logs {
+            for log in logs {
+                match serde_json::from_str(log) {
+                    Err(_) => continue,
+                    Ok(WinningsMessage { winner, winnings }) => {
+                        *totals.entry(winner).or_default() += winnings;
                     }
                 }
-
-                println!("\n\nLeaderboard as of {}", block.height);
-
-                let mut winners = totals.iter().collect::<Vec<_>>();
-                winners.sort_by(|x, y| y.1.cmp(x.1));
-                for (idx, (winner, winnings)) in winners.iter().take(10).enumerate() {
-                    println!("{}: account {winner}: {winnings}", idx + 1);
-                }
-
-                next_height = next_height.next();
             }
         }
     }
+
+    let mut winners = totals
+        .into_iter()
+        .map(|(account, winnings)| LeaderboardEntry { account, winnings })
+        .collect::<Vec<_>>();
+    winners.sort_by(|x, y| y.winnings.cmp(&x.winnings));
+    Ok(winners.into_iter().take(10).collect())
 }

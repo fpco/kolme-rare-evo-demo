@@ -15,3 +15,15 @@ variable "RNG_SERVER_HMAC_SECRET" {
   type        = string
   sensitive   = true
 }
+
+variable "KOLME_POSTGRES_STORE" {
+  description = "Postgres credential for Postgres Store"
+  type        = string
+  sensitive   = true
+}
+
+variable "VALIDATOR_SECRET_KEY" {
+  description = "Validator secret key"
+  type        = string
+  sensitive   = true
+}

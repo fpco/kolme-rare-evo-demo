@@ -29,7 +29,7 @@ tfswitch:
 
 # Terraform refresh
 refresh:
-    terraform refresh
+    amber exec -- terraform refresh
 
 # Format
 fmt:

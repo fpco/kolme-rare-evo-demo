@@ -37,3 +37,5 @@ data "aws_route53_zone" "selected" {
   name         = "prod.fpcomplete.com."
   private_zone = false
 }
+
+data "aws_availability_zones" "available" {}

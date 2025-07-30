@@ -1,5 +1,5 @@
 // API service for fetching game data
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://nlb.prod.fpcomplete.com:3000/';
 
 export interface GameData {
   current_round_finishes: string;

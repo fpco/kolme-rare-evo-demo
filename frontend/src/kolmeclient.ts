@@ -1,7 +1,7 @@
 import { encrypt, decrypt } from 'kolme-client/crypto'
 import { KolmeClient } from 'kolme-client'
 
-export const client = new KolmeClient('http://localhost:3000');
+export const client = new KolmeClient('http://nlb.prod.fpcomplete.com:3000/');
 
 const generateAndStorePrivateKey = async (encryptionKey: string) => {
   const privateKey = client.generatePrivateKey();

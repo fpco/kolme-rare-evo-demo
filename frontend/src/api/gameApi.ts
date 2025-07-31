@@ -72,14 +72,3 @@ export const calculateCountdown = (finishTime: string): number => {
   const diff = Math.max(0, Math.ceil((finish - now) / 1000))
   return diff
 }
-
-// Game actions that integrate with kolmeclient
-export const placeBet = async (params: PlaceBetParams) => {
-  const { placeBet: kolmePlaceBet } = await import('../kolmeclient')
-  return kolmePlaceBet(params.guess, params.amount)
-}
-
-export const claimFunds = async () => {
-  const { claimFunds: kolmeClaimFunds } = await import('../kolmeclient')
-  return kolmeClaimFunds()
-}

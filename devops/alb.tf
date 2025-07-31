@@ -38,7 +38,7 @@ module "alb" {
       port                        = 443
       protocol                    = "HTTPS"
       certificate_arn             = module.acm["rng"].acm_certificate_arn
-      additional_certificate_arns = []
+      additional_certificate_arns = [module.acm["game"].acm_certificate_arn]
       fixed_response = {
         content_type = "text/plain"
         status_code  = "404"

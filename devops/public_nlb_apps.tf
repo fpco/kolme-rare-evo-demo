@@ -12,8 +12,7 @@ locals {
       command = [
         "--app-description",
         "Guess game (ECS production)",
-        "guess-game",
-        "serve",
+        "guess-game"
       ]
       desired_count                      = 1
       enable_autoscaling                 = false

@@ -1,7 +1,6 @@
 locals {
-  rng_server_tag = "a87d02b31850f2d93b05a41a315b766eff6d89f3"
-  validator_tag  = "61ffb8a506530f3818622707db71d30938bde473"
-  guess_game_tag = "01aa244c9797138bf0ac7cebe69150e7b467d7b0"
+  rng_server_tag = "64ce1326d69ad75ead7de1101eeeddac103c4ac1"
+  guess_game_tag = "64ce1326d69ad75ead7de1101eeeddac103c4ac1"
 }
 
 locals {

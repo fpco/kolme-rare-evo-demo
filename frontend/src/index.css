@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fpblock: #FF9409;
+  --font-montserrat: "Montserrat", sans-serif;
+
+}
+
+body {
+  font-family: var(--font-montserrat);
+}
+
+@keyframes pulse-scale {
+  0%,
+  80%,
+  85%,
+  100% {
+    transform: scale(1);
+  }
+  82.5% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 10s infinite;
+}
+
+/* Custom font classes */
+.font-montserrat {
+  font-family: var(--font-montserrat);
+}

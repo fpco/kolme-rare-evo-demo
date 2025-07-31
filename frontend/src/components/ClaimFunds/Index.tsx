@@ -1,25 +1,14 @@
-import { useEffect, useState } from 'react'
-
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { useClaimFunds } from '../../hooks/useGameActions'
-import { hasClaimedFunds } from '../../kolmeclient'
+import { useUserFunds } from '../../hooks/useUserFunds'
 
 const ClaimFunds = () => {
   const claimFundsMutation = useClaimFunds()
-  const [, setRefresh] = useState(0)
-  const alreadyClaimed = hasClaimedFunds()
+  const { data: userFunds } = useUserFunds()
 
   useAutoDismiss(claimFundsMutation, 4000)
 
-  // Listen for funds updates to refresh the component
-  useEffect(() => {
-    const handleFundsUpdate = () => {
-      setRefresh((prev) => prev + 1)
-    }
-
-    window.addEventListener('fundsUpdated', handleFundsUpdate)
-    return () => window.removeEventListener('fundsUpdated', handleFundsUpdate)
-  }, [])
+  const alreadyClaimed = userFunds?.claimed ?? false
 
   const handleClaimFunds = async () => {
     try {

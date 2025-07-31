@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer'
 import { KolmeClient } from 'kolme-client'
 import { decrypt, encrypt } from 'kolme-client/crypto'
+
 import { API_BASE_URL } from './api/gameApi'
 
 export const client = new KolmeClient(API_BASE_URL)
@@ -68,9 +69,6 @@ export const setFundsClaimed = () => {
     `fundsAmount_${userKey}`,
     (currentFunds + 100).toString(),
   )
-
-  // Dispatch event to notify components about funds update
-  window.dispatchEvent(new CustomEvent('fundsUpdated'))
 }
 
 export const getUserFunds = () => {
@@ -88,8 +86,6 @@ export const subtractFunds = (amount: number) => {
     `fundsAmount_${userKey}`,
     (currentFunds - amount).toString(),
   )
-
-  window.dispatchEvent(new CustomEvent('fundsUpdated'))
 }
 
 export const hasSufficientFunds = (amount: number) => {

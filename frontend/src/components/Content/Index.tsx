@@ -9,7 +9,8 @@ import {
 } from '../../api/gameApi'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { usePlaceBet } from '../../hooks/useGameActions'
-import { getUserFunds, hasSufficientFunds } from '../../kolmeclient'
+import { useUserFunds } from '../../hooks/useUserFunds'
+import { hasSufficientFunds } from '../../kolmeclient'
 import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
 
@@ -18,20 +19,11 @@ const Content = () => {
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
   const [betAmount, setBetAmount] = useState('1')
-  const [, setRefresh] = useState(0)
 
   const placeBetMutation = usePlaceBet()
+  const { data: userFunds } = useUserFunds()
 
   useAutoDismiss(placeBetMutation, 4000)
-
-  useEffect(() => {
-    const handleFundsUpdate = () => {
-      setRefresh((prev) => prev + 1)
-    }
-
-    window.addEventListener('fundsUpdated', handleFundsUpdate)
-    return () => window.removeEventListener('fundsUpdated', handleFundsUpdate)
-  }, [])
 
   const {
     data: gameData,
@@ -103,7 +95,7 @@ const Content = () => {
     if (guess >= 0 && guess <= 255 && amount > 0) {
       if (!hasSufficientFunds(amount)) {
         alert(
-          `Insufficient funds! You have ${getUserFunds()} funds but need ${amount}`,
+          `Insufficient funds! You have ${userFunds?.funds || 0} funds but need ${amount}`,
         )
         return
       }

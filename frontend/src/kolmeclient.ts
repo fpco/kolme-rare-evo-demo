@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { KolmeClient } from 'kolme-client'
 import { decrypt, encrypt } from 'kolme-client/crypto'
 

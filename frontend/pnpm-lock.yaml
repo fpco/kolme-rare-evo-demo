@@ -17,6 +17,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.83.0
         version: 5.83.0(react@19.1.1)
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       kolme-client:
         specifier: git://github.com/fpco/kolme-client.git#bcdddfa3ea0e8e785cef1444cad925aa6c23561d
         version: https://codeload.github.com/fpco/kolme-client/tar.gz/bcdddfa3ea0e8e785cef1444cad925aa6c23561d(fp-ts@2.16.10)

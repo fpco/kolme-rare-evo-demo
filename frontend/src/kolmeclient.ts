@@ -4,6 +4,7 @@ import { decrypt, encrypt } from 'kolme-client/crypto'
 import { API_BASE_URL } from './api/gameApi'
 
 export const client = new KolmeClient(API_BASE_URL)
+
 client.subscribeToNotifications((message) => {
   console.log('Received message:', message)
 })

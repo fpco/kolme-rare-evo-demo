@@ -38,3 +38,14 @@ fmt:
 # Open application
 open:
     xdg-open https://rng.prod.fpcomplete.com/public-key
+
+open-tunnel:
+	zehut exec aws -- ec2-instance-connect open-tunnel --instance-id $INSTANCE_ID --remote-port 22 --local-port 3055
+
+# Send key
+send-key:
+	zehut exec aws -- ec2-instance-connect send-ssh-public-key --instance-id $INSTANCE_ID --instance-os-user ubuntu --ssh-public-key file://~/.ssh/id_rsa.pub
+
+# SSH
+ssh-bastion:
+	ssh -i ~/.ssh/id_rsa ubuntu@127.0.0.1 -p 3055

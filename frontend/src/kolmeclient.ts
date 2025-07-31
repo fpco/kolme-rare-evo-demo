@@ -1,8 +1,10 @@
 import { Buffer } from 'buffer'
 import { KolmeClient } from 'kolme-client'
 import { decrypt, encrypt } from 'kolme-client/crypto'
+import { API_BASE_URL } from './api/gameApi'
 
-export const client = new KolmeClient('http://nlb.prod.fpcomplete.com:3000/')
+export const client = new KolmeClient(API_BASE_URL)
+
 client.subscribeToNotifications((message) => {
   console.log('Received message:', message)
 })

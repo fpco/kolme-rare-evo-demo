@@ -1,14 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import {
-  calculateCountdown,
-  fetchGameData,
-  formatLeaderboardData,
-  type GameData,
-} from '../../api/gameApi'
+import { calculateCountdown, formatLeaderboardData } from '../../api/gameApi'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { usePlaceBet } from '../../hooks/useGameActions'
+import { useGameData } from '../../hooks/useGameData'
 import { useUserFunds } from '../../hooks/useUserFunds'
 import { hasSufficientFunds } from '../../kolmeclient'
 import Card from '../Card/Index'
@@ -26,35 +21,16 @@ const Content = () => {
 
   useAutoDismiss(placeBetMutation, 4000)
 
-  // track the last winning number to control animation
-  const lastWinnerRef = useRef<number | null>(null)
+  const { data: gameData, isLoading, error, refetch } = useGameData()
 
-  const {
-    data: gameData,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery<GameData>({
-    queryKey: ['gameData'],
-    queryFn: fetchGameData,
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  })
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to trigger this effect when the number changes
   useEffect(() => {
-    if (gameData?.last_winner) {
-      // show animation when the winning number changed
-      if (lastWinnerRef.current !== gameData.last_winner.number) {
-        setShowAnimation(true)
-        const timeout = setTimeout(() => {
-          setShowAnimation(false)
-          if (gameData.last_winner) {
-            lastWinnerRef.current = gameData.last_winner.number
-          }
-        }, 1500) // animation time
-        return () => clearTimeout(timeout)
-      }
-    }
+    setShowAnimation(true)
+    const timeout = setTimeout(() => {
+      setShowAnimation(false)
+    }, 1500) // animation time
+
+    return () => clearTimeout(timeout)
   }, [gameData?.last_winner])
 
   useEffect(() => {
@@ -81,16 +57,16 @@ const Content = () => {
   }, [gameData?.current_round_finishes, refetch])
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null
+    let timeout: number | null = null
 
     if (countdown > 0) {
-      interval = setInterval(() => {
+      timeout = setTimeout(() => {
         setCountdown((prev) => Math.max(0, prev - 1))
       }, 1000)
     }
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (timeout !== null) clearTimeout(timeout)
     }
   }, [countdown])
 
@@ -255,19 +231,19 @@ const Content = () => {
           <div className="text-center">
             {!gameData?.last_winner || showAnimation ? (
               <>
-                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
+                <h1 className="text-[120px]/35 mt-2 font-bold font-montserrat text-fpblock">
                   {animatedNumber.toString().padStart(3, '0')}
                 </h1>
-                <p className="text-lg text-gray-300 mb-2">
-                  Generating Numbers...
+                <p className="text-lg text-gray-300 mb-10">
+                  Generating Number...
                 </p>
               </>
             ) : (
               <>
-                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
+                <h1 className="text-[120px]/35 mt-2 font-bold font-montserrat text-fpblock">
                   {gameData.last_winner.number}
                 </h1>
-                <p className="text-lg text-gray-300 mb-2">
+                <p className="text-lg text-gray-300 mb-10">
                   Last Winning Number
                 </p>
               </>

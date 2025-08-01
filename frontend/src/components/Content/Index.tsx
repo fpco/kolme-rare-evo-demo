@@ -1,15 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 
-import {
-  calculateCountdown,
-  fetchGameData,
-  formatLeaderboardData,
-  type GameData,
-} from '../../api/gameApi'
+import { calculateCountdown, formatLeaderboardData } from '../../api/gameApi'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { usePlaceBet } from '../../hooks/useGameActions'
-import { getUserFunds, hasSufficientFunds } from '../../kolmeclient'
+import { useGameData } from '../../hooks/useGameData'
+import { useUserFunds } from '../../hooks/useUserFunds'
+import { hasSufficientFunds } from '../../kolmeclient'
 import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
 
@@ -18,32 +14,24 @@ const Content = () => {
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
   const [betAmount, setBetAmount] = useState('1')
-  const [, setRefresh] = useState(0)
+  const [showAnimation, setShowAnimation] = useState(false)
 
   const placeBetMutation = usePlaceBet()
+  const { data: userFunds } = useUserFunds()
 
   useAutoDismiss(placeBetMutation, 4000)
 
+  const { data: gameData, isLoading, error, refetch } = useGameData()
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to trigger this effect when the number changes
   useEffect(() => {
-    const handleFundsUpdate = () => {
-      setRefresh((prev) => prev + 1)
-    }
+    setShowAnimation(true)
+    const timeout = setTimeout(() => {
+      setShowAnimation(false)
+    }, 1500) // animation time
 
-    window.addEventListener('fundsUpdated', handleFundsUpdate)
-    return () => window.removeEventListener('fundsUpdated', handleFundsUpdate)
-  }, [])
-
-  const {
-    data: gameData,
-    isLoading,
-    isFetching,
-    error,
-    refetch,
-  } = useQuery<GameData>({
-    queryKey: ['gameData'],
-    queryFn: fetchGameData,
-    staleTime: 0,
-  })
+    return () => clearTimeout(timeout)
+  }, [gameData?.last_winner])
 
   useEffect(() => {
     if (gameData?.current_round_finishes) {
@@ -69,16 +57,16 @@ const Content = () => {
   }, [gameData?.current_round_finishes, refetch])
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | null = null
+    let timeout: number | null = null
 
     if (countdown > 0) {
-      interval = setInterval(() => {
+      timeout = setTimeout(() => {
         setCountdown((prev) => Math.max(0, prev - 1))
       }, 1000)
     }
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (timeout !== null) clearTimeout(timeout)
     }
   }, [countdown])
 
@@ -103,7 +91,7 @@ const Content = () => {
     if (guess >= 0 && guess <= 255 && amount > 0) {
       if (!hasSufficientFunds(amount)) {
         alert(
-          `Insufficient funds! You have ${getUserFunds()} funds but need ${amount}`,
+          `Insufficient funds! You have ${userFunds?.funds || 0} funds but need ${amount}`,
         )
         return
       }
@@ -241,22 +229,22 @@ const Content = () => {
           </div>
 
           <div className="text-center">
-            {gameData?.last_winner && !isFetching ? (
+            {!gameData?.last_winner || showAnimation ? (
               <>
-                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
-                  {gameData.last_winner.number}
+                <h1 className="text-[120px]/35 mt-2 font-bold font-montserrat text-fpblock">
+                  {animatedNumber.toString().padStart(3, '0')}
                 </h1>
-                <p className="text-lg text-gray-300 mb-2">
-                  Last Winning Number
+                <p className="text-lg text-gray-300 mb-10">
+                  Generating Number...
                 </p>
               </>
             ) : (
               <>
-                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
-                  {animatedNumber.toString().padStart(3, '0')}
+                <h1 className="text-[120px]/35 mt-2 font-bold font-montserrat text-fpblock">
+                  {gameData.last_winner.number}
                 </h1>
-                <p className="text-lg text-gray-300 mb-2">
-                  Generating Numbers...
+                <p className="text-lg text-gray-300 mb-10">
+                  Last Winning Number
                 </p>
               </>
             )}

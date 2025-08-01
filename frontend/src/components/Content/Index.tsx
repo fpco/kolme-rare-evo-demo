@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   calculateCountdown,
@@ -19,23 +19,43 @@ const Content = () => {
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
   const [betAmount, setBetAmount] = useState('1')
+  const [showAnimation, setShowAnimation] = useState(false)
 
   const placeBetMutation = usePlaceBet()
   const { data: userFunds } = useUserFunds()
 
   useAutoDismiss(placeBetMutation, 4000)
 
+  // track the last winning number to control animation
+  const lastWinnerRef = useRef<number | null>(null)
+
   const {
     data: gameData,
     isLoading,
-    isFetching,
     error,
     refetch,
   } = useQuery<GameData>({
     queryKey: ['gameData'],
     queryFn: fetchGameData,
+    refetchOnWindowFocus: false,
     staleTime: 0,
   })
+
+  useEffect(() => {
+    if (gameData?.last_winner) {
+      // show animation when the winning number changed
+      if (lastWinnerRef.current !== gameData.last_winner.number) {
+        setShowAnimation(true)
+        const timeout = setTimeout(() => {
+          setShowAnimation(false)
+          if (gameData.last_winner) {
+            lastWinnerRef.current = gameData.last_winner.number
+          }
+        }, 1500) // animation time
+        return () => clearTimeout(timeout)
+      }
+    }
+  }, [gameData?.last_winner])
 
   useEffect(() => {
     if (gameData?.current_round_finishes) {
@@ -233,22 +253,22 @@ const Content = () => {
           </div>
 
           <div className="text-center">
-            {gameData?.last_winner && !isFetching ? (
-              <>
-                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
-                  {gameData.last_winner.number}
-                </h1>
-                <p className="text-lg text-gray-300 mb-2">
-                  Last Winning Number
-                </p>
-              </>
-            ) : (
+            {!gameData?.last_winner || showAnimation ? (
               <>
                 <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
                   {animatedNumber.toString().padStart(3, '0')}
                 </h1>
                 <p className="text-lg text-gray-300 mb-2">
                   Generating Numbers...
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-[120px] font-bold font-montserrat text-fpblock">
+                  {gameData.last_winner.number}
+                </h1>
+                <p className="text-lg text-gray-300 mb-2">
+                  Last Winning Number
                 </p>
               </>
             )}

@@ -25,21 +25,5 @@ async fn bot_once(
     rng_server: &RngServer,
     secret: &SecretKey,
 ) -> Result<()> {
-    let kolme_r = kolme.read();
-    let Some((guess_timestamp, _wagers)) = kolme_r.get_app_state().pending_wagers.iter().next()
-    else {
-        return Ok(());
-    };
-    let timestamp = Timestamp::from(guess_timestamp);
-    if timestamp > Timestamp::now() {
-        return Ok(());
-    }
-    let result = rng_server.get_result(*guess_timestamp).await?;
-    kolme
-        .sign_propose_await_transaction(
-            secret,
-            vec![Message::App(GuessMessage::SettleBet { result })],
-        )
-        .await?;
-    Ok(())
+    todo!()
 }

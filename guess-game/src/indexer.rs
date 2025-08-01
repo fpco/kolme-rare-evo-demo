@@ -52,18 +52,7 @@ impl Indexer {
     }
 
     pub async fn run(self) -> Result<()> {
-        let mut next_to_index = BlockHeight::start();
-        loop {
-            match self.run_once(next_to_index).await {
-                Err(e) => {
-                    eprintln!("Error while updating indexer for height {next_to_index}: {e}");
-                }
-                Ok(state) => {
-                    *self.state.write().await = state;
-                    next_to_index = next_to_index.next();
-                }
-            }
-        }
+        todo!()
     }
 
     async fn run_once(&self, height: BlockHeight) -> Result<IndexerState> {

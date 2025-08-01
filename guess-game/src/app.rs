@@ -122,101 +122,16 @@ impl KolmeApp for GuessGame {
 }
 
 fn grab_funds(ctx: &mut ExecutionContext<'_, GuessGame>) -> Result<()> {
-    let sender = ctx.get_sender_id();
-    let height = ctx.block_height();
-    let old = ctx.state_mut().received_funds.insert(sender, height);
-    anyhow::ensure!(
-        old.is_none(),
-        "Account {} already received funds",
-        ctx.get_sender_id()
-    );
-    ctx.mint_asset(ASSET_ID, sender, rust_decimal::dec! {100})?;
-    Ok(())
+    todo!()
 }
 
 fn place_bet(ctx: &mut ExecutionContext<'_, GuessGame>, guess: u8, amount: Decimal) -> Result<()> {
-    let sender = ctx.get_sender_id();
-    let timestamp = GuessTimestamp::after(ctx.block_time());
-    ctx.burn_asset(ASSET_ID, sender, amount)?;
-    ctx.state_mut()
-        .pending_wagers
-        .get_or_default(timestamp)
-        .push(Wager {
-            account: sender,
-            guess,
-            amount,
-        });
-    ctx.log_json(&GuessGameLog::Wager {
-        account: sender,
-        timestamp,
-        guess,
-        amount,
-    })?;
-    Ok(())
+    todo!()
 }
 
 fn settle_bet(
     ctx: &mut ExecutionContext<'_, GuessGame>,
     result: &SignedTaggedJson<RngResult>,
 ) -> Result<()> {
-    let pubkey = result.verify_signature()?;
-    anyhow::ensure!(pubkey == ctx.app_state().rng_public_key);
-    let RngResult { number, timestamp } = result.message.as_inner();
-    let timestamp = GuessTimestamp::try_from(*timestamp)?;
-    let wagers = ctx
-        .app_state_mut()
-        .pending_wagers
-        .remove(&timestamp)
-        .context("No pending wagers for given timestamp found")?
-        .1;
-    let number = (*number % 256) as u8;
-
-    let mut total_bet = Decimal::ZERO;
-    let mut winning_weights = HashMap::<_, Decimal>::new();
-    let mut winning_distance = u8::MAX;
-    let mut total_weight = Decimal::ZERO;
-
-    for Wager {
-        account,
-        guess,
-        amount,
-    } in wagers
-    {
-        total_bet += amount;
-        let distance = guess.abs_diff(number);
-        match distance.cmp(&winning_distance) {
-            // New winner! Flush out the old values.
-            std::cmp::Ordering::Less => {
-                winning_distance = distance;
-                winning_weights.clear();
-                total_weight = Decimal::ZERO;
-            }
-            // This is also a winner
-            std::cmp::Ordering::Equal => (),
-            // Not a winner :(
-            std::cmp::Ordering::Greater => continue,
-        }
-        *winning_weights.entry(account).or_default() += amount;
-        total_weight += amount;
-    }
-
-    let mut winnings = BTreeMap::new();
-
-    ctx.log_json(&GuessGameLog::NewWinner {
-        finished: timestamp,
-        number,
-    })?;
-
-    for (winner, weight) in winning_weights {
-        let amount = total_bet * weight / total_weight;
-        ctx.log_json(&GuessGameLog::Winnings {
-            finished: timestamp,
-            winner,
-            amount,
-        })?;
-        ctx.mint_asset(ASSET_ID, winner, amount)?;
-        winnings.insert(winner, amount);
-    }
-
-    Ok(())
+    todo!()
 }

@@ -7,9 +7,9 @@ module "route53_records" {
       domain_prefix = "rng",
       record        = module.alb.dns_name
     },
-    nlb = {
-      domain_prefix = "nlb",
-      record = module.nlb.dns_name
+    game = {
+      domain_prefix = "game",
+      record = module.alb.dns_name
     }
   }
 
@@ -31,6 +31,9 @@ module "acm" {
   for_each = {
     rng = {
       domain_name = "rng.prod.fpcomplete.com",
+    }
+    game = {
+      domain_name = "game.prod.fpcomplete.com",
     }
   }
 

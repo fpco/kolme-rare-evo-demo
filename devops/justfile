@@ -38,6 +38,7 @@ fmt:
 # Open application
 open:
     xdg-open https://rng.prod.fpcomplete.com/public-key
+	xdg-open https://game.prod.fpcomplete.com/guess-game
 
 open-tunnel:
 	zehut exec aws -- ec2-instance-connect open-tunnel --instance-id $INSTANCE_ID --remote-port 22 --local-port 3055

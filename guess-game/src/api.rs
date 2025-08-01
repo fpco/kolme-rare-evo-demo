@@ -45,20 +45,5 @@ struct GuessGameData {
 }
 
 async fn guess_game_data(State(route_state): State<RouteState>) -> Json<GuessGameData> {
-    let RouteState { kolme, indexer } = route_state;
-    let indexer_state = indexer.read().await;
-    let current_round = GuessTimestamp::after(Timestamp::now());
-    Json(GuessGameData {
-        current_round_finishes: current_round.into(),
-        current_bets: kolme
-            .read()
-            .get_app_state()
-            .pending_wagers
-            .get(&current_round)
-            .map_or_else(Decimal::zero, |wagers| {
-                wagers.iter().map(|w| w.amount).sum()
-            }),
-        last_winner: indexer_state.last_winner.clone(),
-        leaderboard: indexer_state.leaderboard.clone(),
-    })
+    todo!()
 }

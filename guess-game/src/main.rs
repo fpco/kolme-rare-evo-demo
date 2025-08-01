@@ -60,14 +60,14 @@ async fn serve(opt: Opt) -> Result<()> {
 
     let indexer = Indexer::new(kolme.clone());
     let indexer_lock = indexer.get_state().clone();
-    set.spawn(indexer.run());
+    // set.spawn(indexer.run());
 
     // The API server provides an HTTP API for the frontend to interact with the chain.
-    set.spawn(make_api_server(kolme.clone(), indexer_lock).run(bind));
+    // set.spawn(make_api_server(kolme.clone(), indexer_lock).run(bind));
 
     // The bot is responsible for periodically checking for new random numbers and
     // updating the chain.
-    set.spawn(bot(kolme.clone(), rng_server));
+    // set.spawn(bot(kolme.clone(), rng_server));
 
     set.join_next()
         .await

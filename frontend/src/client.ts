@@ -65,34 +65,6 @@ export const hasClaimedFunds = () => {
 
 export const setFundsClaimed = () => {
   localStorage.setItem(`hasClaimedFunds_${publicKey}`, 'true')
-  const currentFunds = Number.parseFloat(
-    localStorage.getItem(`fundsAmount_${publicKey}`) || '0',
-  )
-  localStorage.setItem(
-    `fundsAmount_${publicKey}`,
-    (currentFunds + 100).toString(),
-  )
-}
-
-export const getUserFunds = () => {
-  return Number.parseFloat(
-    localStorage.getItem(`fundsAmount_${publicKey}`) || '0',
-  )
-}
-
-export const subtractFunds = (amount: number) => {
-  const currentFunds = getUserFunds()
-  if (currentFunds < amount) {
-    throw new Error('Insufficient funds')
-  }
-  localStorage.setItem(
-    `fundsAmount_${publicKey}`,
-    (currentFunds - amount).toString(),
-  )
-}
-
-export const hasSufficientFunds = (amount: number) => {
-  return getUserFunds() >= amount
 }
 
 export const claimFunds = async () => {
@@ -118,12 +90,6 @@ export const placeBet = async (guess: number, amount: number) => {
     throw new Error('Guess must be between 0 and 255')
   }
 
-  if (!hasSufficientFunds(amount)) {
-    throw new Error(
-      `Insufficient funds. You have ${getUserFunds()} funds but need ${amount}`,
-    )
-  }
-
   const block = await client.broadcast(privateKey, [
     {
       App: {
@@ -134,8 +100,6 @@ export const placeBet = async (guess: number, amount: number) => {
       },
     },
   ])
-
-  subtractFunds(amount)
 
   return block
 }

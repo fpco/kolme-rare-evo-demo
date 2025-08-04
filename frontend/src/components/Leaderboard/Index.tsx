@@ -13,7 +13,7 @@ const Leaderboard = ({ data }: LeaderboardProps) => {
     >
       <h3 className="text-2xl font-bold text-white mb-4">Leaderboard</h3>
 
-      <div className="flex-1 min-h-[600px] flex flex-col">
+      <div className="flex-1 md:min-h-[600px] flex flex-col">
         {data.length === 0 ? (
           <div className="text-center py-8 flex-1 flex flex-col justify-center">
             <div className="text-6xl mb-4">🏆</div>

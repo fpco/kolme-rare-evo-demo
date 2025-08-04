@@ -7,7 +7,7 @@ const NewUser = () => {
           localStorage.clear()
           window.location.reload()
         }}
-        className="font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm bg-slate-700 hover:opacity-90 hover:cursor-pointer text-white"
+        className="font-semibold py-1 px-2 md:py-2 md:px-4 rounded-lg transition-colors duration-200 text-xs md:text-sm bg-slate-700 hover:opacity-90 hover:cursor-pointer text-white"
       >
         New User
       </button>

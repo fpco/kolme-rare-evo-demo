@@ -32,10 +32,37 @@ export interface PlaceBetParams {
   amount: number
 }
 
+export interface UserFundsData {
+  funds: number
+  bet_history: Record<string, Record<string, string>>
+}
+
+export interface AccountIdData {
+  found: {
+    account_id: number
+  }
+}
+
 export const fetchGameData = async (): Promise<GameData> => {
   const response = await fetch(`${API_BASE_URL}/guess-game`)
   if (!response.ok) {
     throw new Error(`Failed to fetch game data: ${response.statusText}`)
+  }
+  return response.json()
+}
+
+export const fetchUserFunds = async (publicKey: string): Promise<UserFundsData> => {
+  const response = await fetch(`${API_BASE_URL}/guess-game/${publicKey}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch user funds: ${response.statusText}`)
+  }
+  return response.json()
+}
+
+export const fetchAccountId = async (publicKey: string): Promise<AccountIdData> => {
+  const response = await fetch(`${API_BASE_URL}/account-id/pubkey/${publicKey}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch account ID: ${response.statusText}`)
   }
   return response.json()
 }

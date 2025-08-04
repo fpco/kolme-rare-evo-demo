@@ -34,7 +34,7 @@ const ClaimFunds = () => {
 
   const getButtonClassName = () => {
     const baseClasses =
-      'font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm'
+      'font-semibold py-1 px-2 md:py-2 md:px-4 rounded-lg transition-colors duration-200 text-xs md:text-sm'
 
     if (claimFundsMutation.isPending) {
       return `${baseClasses} bg-yellow-600 text-white cursor-not-allowed`

@@ -18,16 +18,16 @@ const ClaimFunds = () => {
 
   const getButtonText = () => {
     if (claimFundsMutation.isPending) {
-      return 'Processing...'
+      return 'Claiming...'
     }
     if (claimFundsMutation.isSuccess) {
       return 'Claimed!'
     }
     if (claimFundsMutation.isError) {
-      return 'Failed - Retry'
+      return 'Failed'
     }
     if (alreadyClaimed) {
-      return 'Already Claimed'
+      return 'Claimed'
     }
     return 'Claim Funds'
   }

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import { calculateCountdown, formatLeaderboardData } from '../../api/gameApi'
+import { hasSufficientFunds } from '../../client'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { usePlaceBet } from '../../hooks/useGameActions'
 import { useGameData } from '../../hooks/useGameData'
-import { useUserFunds } from '../../hooks/useUserFunds'
-import { hasSufficientFunds } from '../../kolmeclient'
 import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
 
@@ -17,7 +16,6 @@ const Content = () => {
   const [showAnimation, setShowAnimation] = useState(false)
 
   const placeBetMutation = usePlaceBet()
-  const { data: userFunds } = useUserFunds()
 
   useAutoDismiss(placeBetMutation, 4000)
 
@@ -89,13 +87,6 @@ const Content = () => {
     const amount = Number(betAmount)
 
     if (guess >= 0 && guess <= 255 && amount > 0) {
-      if (!hasSufficientFunds(amount)) {
-        alert(
-          `Insufficient funds! You have ${userFunds?.funds || 0} funds but need ${amount}`,
-        )
-        return
-      }
-
       try {
         await placeBetMutation.mutateAsync({ guess, amount })
         setUserGuess('') // Clear input after successful bet

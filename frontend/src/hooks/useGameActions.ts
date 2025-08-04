@@ -1,12 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import type { PlaceBetParams } from '../api/gameApi'
-import {
-  claimFunds,
-  placeBet,
-  setFundsClaimed,
-  subtractFunds,
-} from '../kolmeclient'
+import { claimFunds, placeBet, setFundsClaimed, subtractFunds } from '../client'
 import { USER_FUNDS_QUERY_KEY } from './useUserFunds'
 
 // Wrapper function that assumes success after timeout and updates localStorage accordingly

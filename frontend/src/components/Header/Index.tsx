@@ -8,10 +8,10 @@ const Header = () => {
   const { data: userFunds } = useUserFunds()
 
   return (
-    <Card className="w-full flex justify-between items-center rounded-b-xl md:mt-2 md:p-0 bg-black/30 md:bg-transparent">
+    <Card className="w-full flex justify-between items-center rounded-b-xl md:mt-2 md:p-0">
       <p className="text-3xl font-bold font-montserrat md:px-4">Kolme</p>
       <div className="flex items-center space-x-4">
-        <div className="md:bg-black/30 md:p-4 rounded-xl flex items-center space-x-4">
+        <div className="md:p-4 rounded-xl flex items-center space-x-4">
           <div className="hidden md:block text-left">
             {userFunds ? (
               <>

@@ -133,7 +133,7 @@ const Content = () => {
       <div className="flex flex-col-reverse justify-center items-center md:flex-row max-w-full gap-4 min-h-2/3">
         <Card
           id="leaderboard"
-          className="w-full md:w-1/3 bg-black/30 rounded-xl"
+          className="w-full md:w-1/3 bg-gray-800/30 rounded-xl"
         >
           <div className="text-center text-white p-8">
             Loading leaderboard...
@@ -159,7 +159,7 @@ const Content = () => {
       <div className="flex flex-col-reverse justify-center items-center md:flex-row max-w-full gap-4 min-h-2/3">
         <Card
           id="leaderboard"
-          className="w-full md:w-1/3 bg-black/30 rounded-xl"
+          className="w-full md:w-1/3 bg-gray-800/30 rounded-xl"
         >
           <div className="text-center text-red-400 p-8">
             <h3 className="text-xl font-bold mb-2">Connection Error</h3>
@@ -259,28 +259,20 @@ const Content = () => {
                   setUserGuess(value)
                 }
               }}
-              className="w-full ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-3 text-center text-white placeholder-gray-400"
+              className="w-full ring-1 ring-fpblock rounded-lg bg-gray-800/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-3 text-center text-white placeholder-gray-400"
               disabled={countdown === 0}
             />
 
-            <div className="flex flex-row sm:items-center gap-2">
-              <label
-                htmlFor="betAmount"
-                className="text-sm text-gray-300 sm:shrink-0"
-              >
-                Bet Amount:
-              </label>
-              <input
-                id="betAmount"
-                type="number"
-                min="0"
-                placeholder="Enter amount"
-                value={betAmount}
-                onChange={(e) => setBetAmount(e.target.value)}
-                className="w-full sm:flex-1 ring-1 ring-fpblock rounded-lg bg-black/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-2 text-center text-white placeholder-gray-400"
-                disabled={countdown === 0}
-              />
-            </div>
+            <input
+              id="betAmount"
+              type="number"
+              min="0"
+              placeholder="Enter bet amount"
+              value={betAmount}
+              onChange={(e) => setBetAmount(e.target.value)}
+              className="w-full ring-1 ring-fpblock rounded-lg bg-gray-800/30 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-3 text-center text-white placeholder-gray-400"
+              disabled={countdown === 0}
+            />
 
             <button
               type="button"

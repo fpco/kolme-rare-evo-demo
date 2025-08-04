@@ -4,8 +4,13 @@ import Card from '../Card/Index'
 
 const Footer = () => {
   return (
-    <Card className="md:bg-black/30 rounded-xl flex items-center justify-between p-4">
-      <a href="https://www.fpblock.com/" target="_blank" rel="noopener" className='group'>
+    <Card className="md:bg-gray-800/30 rounded-xl flex items-center justify-between p-4">
+      <a
+        href="https://www.fpblock.com/"
+        target="_blank"
+        rel="noopener"
+        className="group"
+      >
         <img
           src="https://framerusercontent.com/images/wBvSDht7DqRJpSfO2xTNgwgjvvo.png"
           srcSet="https://framerusercontent.com/images/wBvSDht7DqRJpSfO2xTNgwgjvvo.png?scale-down-to=512 512w,https://framerusercontent.com/images/wBvSDht7DqRJpSfO2xTNgwgjvvo.png?scale-down-to=1024 1024w,https://framerusercontent.com/images/wBvSDht7DqRJpSfO2xTNgwgjvvo.png 1528w"

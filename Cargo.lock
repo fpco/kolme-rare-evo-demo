@@ -3209,7 +3209,7 @@ dependencies = [
 [[package]]
 name = "kolme"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "anyhow",
  "axum 0.8.4",
@@ -3217,6 +3217,7 @@ dependencies = [
  "borsh",
  "cosmos",
  "cosmwasm-std",
+ "futures-util",
  "hex",
  "jiff",
  "kolme-solana-bridge-client",
@@ -3239,6 +3240,7 @@ dependencies = [
  "strum 0.27.1",
  "thiserror 2.0.12",
  "tokio",
+ "tokio-tungstenite 0.26.2",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -3247,7 +3249,7 @@ dependencies = [
 [[package]]
 name = "kolme-solana-bridge-client"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "borsh",
  "shared",
@@ -3264,7 +3266,7 @@ dependencies = [
 [[package]]
 name = "kolme-store"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "anyhow",
  "enum_dispatch",
@@ -3989,7 +3991,7 @@ dependencies = [
 [[package]]
 name = "merkle-map"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "arrayvec",
  "base64 0.22.1",
@@ -5915,7 +5917,7 @@ dependencies = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=5e50b7211bc662a79ba8171363c933809bfc3f0a#5e50b7211bc662a79ba8171363c933809bfc3f0a"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "borsh",
  "cosmwasm-std",

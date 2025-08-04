@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.98"
 clap = { version = "4.5.41", features = ["env", "derive"] }
-kolme = { git = "https://github.com/fpco/kolme", rev = "5e50b7211bc662a79ba8171363c933809bfc3f0a" }
+kolme = { git = "https://github.com/fpco/kolme", rev = "acafa4b8d07634e04a67e4f66379579d0ab2b2e1" }
 reqwest = { version = "0.12.22", features = ["rustls-tls-webpki-roots", "json", "gzip", "brotli", "blocking"], default-features = false }
 rust_decimal = { version = "1.37.2", features = ["macros"] }
 serde = { version = "1.0.219", features = ["derive"] }

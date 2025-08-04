@@ -31,18 +31,5 @@ export const useAccountId = () => {
     queryKey: ACCOUNT_ID_QUERY_KEY,
     queryFn: () => fetchAccountId(publicKey),
     enabled: hasClaimed,
-    refetchInterval: (query) => {
-      // refetch every 2 seconds if we don't have data yet and funds are claimed
-      if (!query.state.data?.found && hasClaimed) {
-        return 2000
-      }
-      return false
-    },
-    retry: (failureCount) => {
-      // retry up to 10 times to fetch account ID
-      // this is to handle cases where the account ID might not be available immediately after claiming funds
-      return failureCount < 10
-    },
-    retryDelay: 2000,
   })
 }

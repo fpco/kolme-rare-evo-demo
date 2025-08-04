@@ -1,6 +1,6 @@
 locals {
-  rng_server_tag = "64ce1326d69ad75ead7de1101eeeddac103c4ac1"
-  guess_game_tag = "64ce1326d69ad75ead7de1101eeeddac103c4ac1"
+  rng_server_tag = "5c6a838f72391f4b9af79c0f010895a9c0da1bb6"
+  guess_game_tag = "5c6a838f72391f4b9af79c0f010895a9c0da1bb6"
 }
 
 locals {

@@ -42,11 +42,18 @@ pub enum GuessMessage {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GuessGameLog {
+    Wager {
+        account: AccountId,
+        timestamp: GuessTimestamp,
+        guess: u8,
+        amount: Decimal,
+    },
     NewWinner {
         finished: GuessTimestamp,
         number: u8,
     },
     Winnings {
+        finished: GuessTimestamp,
         winner: AccountId,
         amount: Decimal,
     },
@@ -74,7 +81,7 @@ impl GuessGame {
     }
 }
 
-const ASSET_ID: AssetId = AssetId(0);
+pub const ASSET_ID: AssetId = AssetId(0);
 
 impl KolmeApp for GuessGame {
     type State = GuessState;
@@ -139,6 +146,12 @@ fn place_bet(ctx: &mut ExecutionContext<'_, GuessGame>, guess: u8, amount: Decim
             guess,
             amount,
         });
+    ctx.log_json(&GuessGameLog::Wager {
+        account: sender,
+        timestamp,
+        guess,
+        amount,
+    })?;
     Ok(())
 }
 
@@ -196,7 +209,11 @@ fn settle_bet(
 
     for (winner, weight) in winning_weights {
         let amount = total_bet * weight / total_weight;
-        ctx.log_json(&GuessGameLog::Winnings { winner, amount })?;
+        ctx.log_json(&GuessGameLog::Winnings {
+            finished: timestamp,
+            winner,
+            amount,
+        })?;
         ctx.mint_asset(ASSET_ID, winner, amount)?;
         winnings.insert(winner, amount);
     }

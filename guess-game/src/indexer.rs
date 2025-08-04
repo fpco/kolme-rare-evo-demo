@@ -7,20 +7,23 @@ use anyhow::Result;
 use kolme::*;
 use tokio::sync::RwLock;
 
-use crate::app::{GuessGame, GuessGameLog};
+use crate::{
+    app::{GuessGame, GuessGameLog},
+    time::GuessTimestamp,
+};
 
 pub type IndexerStateLock = Arc<RwLock<IndexerState>>;
 
 #[derive(Default, Clone)]
 pub struct IndexerState {
-    pub last_winner: Option<LastWinner>,
     pub leaderboard: Vec<LeaderboardEntry>,
     pub total_winnings: HashMap<AccountId, Decimal>,
+    pub user_bet_history: HashMap<AccountId, BTreeMap<GuessTimestamp, BTreeMap<u8, Decimal>>>,
+    pub results: BTreeMap<GuessTimestamp, RoundResults>,
 }
 
 #[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
-pub struct LastWinner {
-    pub finished: Timestamp,
+pub struct RoundResults {
     pub number: u8,
     pub winnings: BTreeMap<AccountId, Decimal>,
 }
@@ -73,33 +76,50 @@ impl Indexer {
 }
 
 fn update(state: &mut IndexerState, logs: &[Vec<String>]) {
-    let mut new_winner = None;
     for log in logs.iter().flat_map(|v| v.iter()) {
         if let Ok(log) = serde_json::from_str::<GuessGameLog>(log) {
             match log {
-                GuessGameLog::NewWinner { finished, number } => {
-                    assert_eq!(new_winner, None);
-                    new_winner = Some(LastWinner {
-                        finished: finished.into(),
-                        number,
-                        winnings: BTreeMap::new(),
-                    });
+                GuessGameLog::Wager {
+                    account,
+                    timestamp,
+                    guess,
+                    amount,
+                } => {
+                    *state
+                        .user_bet_history
+                        .entry(account)
+                        .or_default()
+                        .entry(timestamp)
+                        .or_default()
+                        .entry(guess)
+                        .or_default() += amount;
                 }
-                GuessGameLog::Winnings { winner, amount } => {
+                GuessGameLog::NewWinner { finished, number } => {
+                    let old = state.results.insert(
+                        finished,
+                        RoundResults {
+                            number,
+                            winnings: BTreeMap::new(),
+                        },
+                    );
+                    assert_eq!(old, None);
+                }
+                GuessGameLog::Winnings {
+                    winner,
+                    amount,
+                    finished,
+                } => {
                     *state.total_winnings.entry(winner).or_default() += amount;
-
-                    let new_winner = new_winner
-                        .as_mut()
-                        .expect("update: impossible None for new_winner");
-                    let old = new_winner.winnings.insert(winner, amount);
+                    let old = state
+                        .results
+                        .get_mut(&finished)
+                        .expect("Logic error: NewWinner must come before Winnings")
+                        .winnings
+                        .insert(winner, amount);
                     assert_eq!(old, None);
                 }
             }
         }
-    }
-
-    if new_winner.is_some() {
-        state.last_winner = new_winner;
     }
 
     let mut winners = state

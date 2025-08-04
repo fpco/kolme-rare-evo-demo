@@ -3,7 +3,9 @@ use std::fmt::Display;
 use kolme::*;
 
 /// A guess timestamp, which is minutes from the epoch.
-#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+#[derive(
+    Debug, Clone, Copy, serde::Serialize, serde::Deserialize, PartialEq, Eq, PartialOrd, Ord,
+)]
 pub struct GuessTimestamp(u64);
 
 impl ToMerkleKey for GuessTimestamp {

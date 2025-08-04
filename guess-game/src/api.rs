@@ -1,12 +1,18 @@
+use std::collections::BTreeMap;
+
 use kolme::{
-    axum::{Json, Router, extract::State, routing::get},
+    axum::{
+        Json, Router,
+        extract::{Path, State},
+        routing::get,
+    },
     *,
 };
 use rust_decimal::prelude::Zero;
 
 use crate::{
-    app::GuessGame,
-    indexer::{IndexerStateLock, LastWinner, LeaderboardEntry},
+    app::{ASSET_ID, GuessGame},
+    indexer::{IndexerStateLock, LeaderboardEntry, RoundResults},
     time::GuessTimestamp,
 };
 
@@ -28,6 +34,7 @@ struct RouteState {
 fn make_extra_routes(route_state: RouteState) -> Router {
     Router::new()
         .route("/guess-game", get(guess_game_data))
+        .route("/guess-game/{account_id}", get(account_data))
         .with_state(route_state)
 }
 
@@ -44,10 +51,24 @@ struct GuessGameData {
     leaderboard: Vec<LeaderboardEntry>,
 }
 
+#[derive(serde::Serialize, Debug, Clone, PartialEq, Eq)]
+struct LastWinner {
+    finished: Timestamp,
+    number: u8,
+    winnings: BTreeMap<AccountId, Decimal>,
+}
+
 async fn guess_game_data(State(route_state): State<RouteState>) -> Json<GuessGameData> {
     let RouteState { kolme, indexer } = route_state;
     let indexer_state = indexer.read().await;
     let current_round = GuessTimestamp::after(Timestamp::now());
+    let last_winner = indexer_state.results.last_key_value().map(
+        |(finished, RoundResults { number, winnings })| LastWinner {
+            finished: finished.into(),
+            number: *number,
+            winnings: winnings.clone(),
+        },
+    );
     Json(GuessGameData {
         current_round_finishes: current_round.into(),
         current_bets: kolme
@@ -58,7 +79,40 @@ async fn guess_game_data(State(route_state): State<RouteState>) -> Json<GuessGam
             .map_or_else(Decimal::zero, |wagers| {
                 wagers.iter().map(|w| w.amount).sum()
             }),
-        last_winner: indexer_state.last_winner.clone(),
+        last_winner,
         leaderboard: indexer_state.leaderboard.clone(),
     })
+}
+
+#[derive(serde::Serialize)]
+struct AccountData {
+    funds: Decimal,
+    bet_history: BTreeMap<Timestamp, BTreeMap<u8, Decimal>>,
+}
+
+async fn account_data(
+    State(route_state): State<RouteState>,
+    Path(account_id): Path<AccountId>,
+) -> Json<AccountData> {
+    let funds = route_state
+        .kolme
+        .read()
+        .get_framework_state()
+        .get_accounts()
+        .get_account(account_id)
+        .and_then(|account| account.get_assets().get(&ASSET_ID))
+        .cloned()
+        .unwrap_or_default();
+    let bet_history = route_state
+        .indexer
+        .read()
+        .await
+        .user_bet_history
+        .get(&account_id)
+        .map_or_else(BTreeMap::new, |orig| {
+            orig.iter()
+                .map(|(timestamp, guesses)| (timestamp.into(), guesses.clone()))
+                .collect()
+        });
+    Json(AccountData { funds, bet_history })
 }

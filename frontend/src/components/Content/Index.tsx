@@ -28,7 +28,7 @@ const Content = () => {
     setShowAnimation(true)
     const timeout = setTimeout(() => {
       setShowAnimation(false)
-    }, 1500) // animation time
+    }, 1500)
 
     return () => clearTimeout(timeout)
   }, [gameData?.last_winner])

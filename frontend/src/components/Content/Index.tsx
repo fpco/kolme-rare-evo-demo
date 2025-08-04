@@ -107,7 +107,7 @@ const Content = () => {
       return 'Failed - Retry'
     }
     if (betAmount && !hasSufficientFunds(Number(betAmount))) {
-      return `Insufficient Funds (Need ${Number(betAmount)})`
+      return 'Insufficient Funds'
     }
     return 'Place Bet'
   }
@@ -125,7 +125,7 @@ const Content = () => {
     if (placeBetMutation.isError) {
       return `${baseClasses} bg-red-600 hover:bg-red-500 text-white cursor-pointer`
     }
-    return `${baseClasses} bg-fpblock hover:bg-fpblock/80 disabled:bg-gray-600 text-white`
+    return `${baseClasses} bg-fpblock hover:bg-fpblock/80 disabled:bg-gray-700 text-white disabled:text-gray-400`
   }
 
   if (isLoading) {

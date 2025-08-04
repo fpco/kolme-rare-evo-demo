@@ -46,9 +46,9 @@ const ClaimFunds = () => {
       return `${baseClasses} bg-red-600 hover:bg-red-500 text-white cursor-pointer`
     }
     if (alreadyClaimed) {
-      return `${baseClasses} bg-gray-600 text-white cursor-not-allowed`
+      return `${baseClasses} bg-gray-700 text-gray-400 cursor-not-allowed`
     }
-    return `${baseClasses} bg-fpblock hover:opacity-90 hover:cursor-pointer disabled:bg-gray-600 text-white`
+    return `${baseClasses} bg-fpblock hover:opacity-90 hover:cursor-pointer`
   }
 
   return (

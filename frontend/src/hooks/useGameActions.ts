@@ -54,7 +54,6 @@ const withTimeoutForPlaceBet = (
         if (!completed) {
           completed = true
           console.log('Place bet assumed successful after timeout')
-          // No longer subtract funds locally - will be refetched from API
           resolve({})
         }
       }, timeoutMs)
@@ -104,7 +103,6 @@ export const useClaimFunds = () => {
       // Invalidate and refetch game data after successful claim
       queryClient.invalidateQueries({ queryKey: ['gameData'] })
       queryClient.invalidateQueries({ queryKey: USER_FUNDS_QUERY_KEY })
-      // Invalidate account ID query so it starts fetching with the new enabled state
       queryClient.invalidateQueries({ queryKey: ACCOUNT_ID_QUERY_KEY })
     },
     onError: (error) => {

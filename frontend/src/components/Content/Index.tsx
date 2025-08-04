@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 
 import { calculateCountdown, formatLeaderboardData } from '../../api/gameApi'
 import { useAutoDismiss } from '../../hooks/useAutoDismiss'
 import { usePlaceBet } from '../../hooks/useGameActions'
 import { useGameData } from '../../hooks/useGameData'
-import { useUserFunds, USER_FUNDS_QUERY_KEY } from '../../hooks/useUserFunds'
+import { USER_FUNDS_QUERY_KEY, useUserFunds } from '../../hooks/useUserFunds'
 import BetHistory from '../BetHistory/Index'
 import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
@@ -157,7 +157,9 @@ const Content = () => {
             <div className="text-4xl font-bold text-fpblock mb-4">
               Loading...
             </div>
-            <h1 className="text-[120px] md:text-[220px] font-bold font-montserrat">---</h1>
+            <h1 className="text-[120px] md:text-[220px] font-bold font-montserrat">
+              ---
+            </h1>
           </div>
         </Card>
       </div>
@@ -258,7 +260,9 @@ const Content = () => {
                 min="0"
                 max="255"
                 placeholder={
-                  countdown === 0 ? 'Betting closed' : 'Enter your guess (0-255)'
+                  countdown === 0
+                    ? 'Betting closed'
+                    : 'Enter your guess (0-255)'
                 }
                 value={userGuess}
                 onChange={(e) => {
@@ -306,7 +310,9 @@ const Content = () => {
               <p>
                 Round finishes:{' '}
                 {gameData?.current_round_finishes
-                  ? new Date(gameData.current_round_finishes).toLocaleTimeString()
+                  ? new Date(
+                      gameData.current_round_finishes,
+                    ).toLocaleTimeString()
                   : 'Loading...'}
               </p>
             </div>

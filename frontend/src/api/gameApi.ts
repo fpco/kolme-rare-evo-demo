@@ -51,7 +51,9 @@ export const fetchGameData = async (): Promise<GameData> => {
   return response.json()
 }
 
-export const fetchUserFunds = async (publicKey: string): Promise<UserFundsData> => {
+export const fetchUserFunds = async (
+  publicKey: string,
+): Promise<UserFundsData> => {
   const response = await fetch(`${API_BASE_URL}/guess-game/${publicKey}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch user funds: ${response.statusText}`)
@@ -59,7 +61,9 @@ export const fetchUserFunds = async (publicKey: string): Promise<UserFundsData> 
   return response.json()
 }
 
-export const fetchAccountId = async (publicKey: string): Promise<AccountIdData> => {
+export const fetchAccountId = async (
+  publicKey: string,
+): Promise<AccountIdData> => {
   const response = await fetch(`${API_BASE_URL}/account-id/pubkey/${publicKey}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch account ID: ${response.statusText}`)

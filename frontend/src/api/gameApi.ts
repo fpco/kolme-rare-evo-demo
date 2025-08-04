@@ -15,7 +15,7 @@ export interface LastWinner {
 }
 
 export interface LeaderboardEntry {
-  account: string
+  account: number
   winnings: string
 }
 
@@ -23,7 +23,7 @@ export interface FormattedLeaderboardEntry {
   rank: number
   avatar: string
   username: string
-  walletId: string
+  account: number
   points: number
 }
 
@@ -52,16 +52,14 @@ export const formatLeaderboardData = (
     }
 
     // If points are equal, sort by account numerically for stable ordering
-    const accountA = Number.parseInt(String(a.account)) || 0
-    const accountB = Number.parseInt(String(b.account)) || 0
-    return accountA - accountB
+    return a.account - b.account
   })
 
   return sortedLeaderboard.map((entry, index) => ({
     rank: index + 1,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.account}`,
     username: `Player #${entry.account}`,
-    walletId: entry.account,
+    account: entry.account,
     points: Math.round(Number.parseFloat(entry.winnings) * 100), // Multiply by 100 for display
   }))
 }

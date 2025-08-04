@@ -65,7 +65,7 @@ export const hasClaimedFunds = () => {
 
 export const setFundsClaimed = () => {
   localStorage.setItem(`hasClaimedFunds_${publicKey}`, 'true')
-  const currentFunds = Number.parseInt(
+  const currentFunds = Number.parseFloat(
     localStorage.getItem(`fundsAmount_${publicKey}`) || '0',
   )
   localStorage.setItem(
@@ -75,7 +75,7 @@ export const setFundsClaimed = () => {
 }
 
 export const getUserFunds = () => {
-  return Number.parseInt(
+  return Number.parseFloat(
     localStorage.getItem(`fundsAmount_${publicKey}`) || '0',
   )
 }

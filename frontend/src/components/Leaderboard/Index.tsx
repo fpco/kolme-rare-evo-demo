@@ -1,15 +1,8 @@
+import type { FormattedLeaderboardEntry } from '../../api/gameApi'
 import Card from '../Card/Index'
 
-interface LeaderboardEntry {
-  rank: number
-  avatar: string
-  username: string
-  walletId: string
-  points: number
-}
-
 interface LeaderboardProps {
-  data: LeaderboardEntry[]
+  data: FormattedLeaderboardEntry[]
 }
 
 const Leaderboard = ({ data }: LeaderboardProps) => {

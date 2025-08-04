@@ -1,13 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import type { PlaceBetParams } from '../api/gameApi'
-import {
-  claimFunds,
-  placeBet,
-  setFundsClaimed,
-  subtractFunds,
-} from '../kolmeclient'
-import { USER_FUNDS_QUERY_KEY } from './useUserFunds'
+import { claimFunds, placeBet, setFundsClaimed } from '../client'
+import { ACCOUNT_ID_QUERY_KEY, USER_FUNDS_QUERY_KEY } from './useUserFunds'
 
 // Wrapper function that assumes success after timeout and updates localStorage accordingly
 // This is because we dont receive a success response
@@ -59,12 +54,7 @@ const withTimeoutForPlaceBet = (
         if (!completed) {
           completed = true
           console.log('Place bet assumed successful after timeout')
-          try {
-            subtractFunds(params.amount)
-            resolve({})
-          } catch (error) {
-            reject(error)
-          }
+          resolve({})
         }
       }, timeoutMs)
 
@@ -113,6 +103,7 @@ export const useClaimFunds = () => {
       // Invalidate and refetch game data after successful claim
       queryClient.invalidateQueries({ queryKey: ['gameData'] })
       queryClient.invalidateQueries({ queryKey: USER_FUNDS_QUERY_KEY })
+      queryClient.invalidateQueries({ queryKey: ACCOUNT_ID_QUERY_KEY })
     },
     onError: (error) => {
       console.error('Error claiming funds:', error)

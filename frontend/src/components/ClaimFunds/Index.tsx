@@ -18,23 +18,23 @@ const ClaimFunds = () => {
 
   const getButtonText = () => {
     if (claimFundsMutation.isPending) {
-      return 'Processing...'
+      return 'Claiming...'
     }
     if (claimFundsMutation.isSuccess) {
       return 'Claimed!'
     }
     if (claimFundsMutation.isError) {
-      return 'Failed - Retry'
+      return 'Failed'
     }
     if (alreadyClaimed) {
-      return 'Already Claimed'
+      return 'Claimed'
     }
     return 'Claim Funds'
   }
 
   const getButtonClassName = () => {
     const baseClasses =
-      'font-semibold py-2 px-4 rounded-lg transition-colors duration-200 text-sm'
+      'font-semibold py-1 px-2 md:py-2 md:px-4 rounded-lg transition-colors duration-200 text-xs md:text-sm'
 
     if (claimFundsMutation.isPending) {
       return `${baseClasses} bg-yellow-600 text-white cursor-not-allowed`
@@ -46,9 +46,9 @@ const ClaimFunds = () => {
       return `${baseClasses} bg-red-600 hover:bg-red-500 text-white cursor-pointer`
     }
     if (alreadyClaimed) {
-      return `${baseClasses} bg-gray-600 text-white cursor-not-allowed`
+      return `${baseClasses} bg-gray-700 text-gray-400 cursor-not-allowed`
     }
-    return `${baseClasses} bg-fpblock hover:opacity-90 hover:cursor-pointer disabled:bg-gray-600 text-white`
+    return `${baseClasses} bg-fpblock hover:opacity-90 hover:cursor-pointer`
   }
 
   return (

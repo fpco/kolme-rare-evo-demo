@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-fpblock: #FF9409;
+  --color-fpblock: #ed7206;
   --font-montserrat: "Montserrat", sans-serif;
-
 }
 
 body {
   font-family: var(--font-montserrat);
+  overflow-x: hidden;
 }
 
 @keyframes pulse-scale {
@@ -22,8 +22,23 @@ body {
   }
 }
 
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-pulse-scale {
   animation: pulse-scale 10s infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
 }
 
 /* Custom font classes */

@@ -19,7 +19,7 @@ if (rootElement) {
   createRoot(rootElement).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <div className="min-w-screen min-h-screen flex justify-center bg-slate-950 text-white">
+        <div className="min-h-screen flex justify-center bg-slate-950 text-white w-full">
           <App />
         </div>
       </QueryClientProvider>

@@ -3209,7 +3209,7 @@ dependencies = [
 [[package]]
 name = "kolme"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=9715a5495fcf448c202033ff774faadd164634d7#9715a5495fcf448c202033ff774faadd164634d7"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "anyhow",
  "axum 0.8.4",
@@ -3249,7 +3249,7 @@ dependencies = [
 [[package]]
 name = "kolme-solana-bridge-client"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=9715a5495fcf448c202033ff774faadd164634d7#9715a5495fcf448c202033ff774faadd164634d7"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "borsh",
  "shared",
@@ -3266,7 +3266,7 @@ dependencies = [
 [[package]]
 name = "kolme-store"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=9715a5495fcf448c202033ff774faadd164634d7#9715a5495fcf448c202033ff774faadd164634d7"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "anyhow",
  "enum_dispatch",
@@ -3991,7 +3991,7 @@ dependencies = [
 [[package]]
 name = "merkle-map"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=9715a5495fcf448c202033ff774faadd164634d7#9715a5495fcf448c202033ff774faadd164634d7"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "arrayvec",
  "base64 0.22.1",
@@ -5917,7 +5917,7 @@ dependencies = [
 [[package]]
 name = "shared"
 version = "0.1.0"
-source = "git+https://github.com/fpco/kolme?rev=9715a5495fcf448c202033ff774faadd164634d7#9715a5495fcf448c202033ff774faadd164634d7"
+source = "git+https://github.com/fpco/kolme?rev=acafa4b8d07634e04a67e4f66379579d0ab2b2e1#acafa4b8d07634e04a67e4f66379579d0ab2b2e1"
 dependencies = [
  "borsh",
  "cosmwasm-std",

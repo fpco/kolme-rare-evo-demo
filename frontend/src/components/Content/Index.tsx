@@ -11,7 +11,7 @@ import Card from '../Card/Index'
 import Leaderboard from '../Leaderboard/Index'
 
 const Content = () => {
-  const [countdown, setCountdown] = useState(0)
+  const [countdown, setCountdown] = useState<number>()
   const [userGuess, setUserGuess] = useState('')
   const [animatedNumber, setAnimatedNumber] = useState(0)
   const [betAmount, setBetAmount] = useState('1')
@@ -29,20 +29,19 @@ const Content = () => {
     return (userFunds?.funds || 0) >= amount
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we want to trigger this effect when the number changes
-  useEffect(() => {
-    setShowAnimation(true)
-    const timeout = setTimeout(() => {
-      setShowAnimation(false)
-    }, 1500)
-
-    return () => clearTimeout(timeout)
-  }, [gameData?.last_winner])
-
   useEffect(() => {
     if (gameData?.current_round_finishes) {
+      setShowAnimation(false)
       const newCountdown = calculateCountdown(gameData.current_round_finishes)
       setCountdown(newCountdown)
+
+      const interval = setInterval(() => {
+        setCountdown((prev) => Math.max(0, (prev ?? 0) - 1))
+      }, 1000)
+
+      return () => {
+        clearInterval(interval)
+      }
     }
   }, [gameData])
 
@@ -65,16 +64,8 @@ const Content = () => {
   }, [gameData?.current_round_finishes, refetch, queryClient])
 
   useEffect(() => {
-    let timeout: number | null = null
-
-    if (countdown > 0) {
-      timeout = setTimeout(() => {
-        setCountdown((prev) => Math.max(0, prev - 1))
-      }, 1000)
-    }
-
-    return () => {
-      if (timeout !== null) clearTimeout(timeout)
+    if (countdown === 0) {
+      setShowAnimation(true)
     }
   }, [countdown])
 
@@ -100,6 +91,7 @@ const Content = () => {
       try {
         await placeBetMutation.mutateAsync({ guess, amount })
         setUserGuess('') // Clear input after successful bet
+        setBetAmount('') // Clear input after successful bet
       } catch {
         // Error is handled in the hook
       }
@@ -222,7 +214,7 @@ const Content = () => {
         >
           <div className="w-full h-full items-center justify-center flex flex-col gap-4">
             <div className="text-4xl font-bold text-fpblock mb-4">
-              {countdown > 0 ? (
+              {countdown !== undefined && countdown > 0 ? (
                 <>
                   <span className="text-white">Next Round in: </span>
                   <span className="text-fpblock">{countdown}s</span>

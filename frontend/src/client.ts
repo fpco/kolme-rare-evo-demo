@@ -6,10 +6,6 @@ import { API_BASE_URL } from './api/gameApi'
 
 export const client = new KolmeClient(API_BASE_URL)
 
-client.subscribeToNotifications((message) => {
-  console.log('Received message:', message)
-})
-
 const generateRandomKey = () => {
   return (
     Math.random().toString(36).substring(2, 15) +

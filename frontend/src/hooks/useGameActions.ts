@@ -17,7 +17,6 @@ const withTimeoutForClaimFunds = (
       const timeout = setTimeout(() => {
         if (!completed) {
           completed = true
-          console.log('Claim funds assumed successful after timeout')
           setFundsClaimed()
           resolve({})
         }
@@ -53,7 +52,6 @@ const withTimeoutForPlaceBet = (
       const timeout = setTimeout(() => {
         if (!completed) {
           completed = true
-          console.log('Place bet assumed successful after timeout')
           resolve({})
         }
       }, timeoutMs)
